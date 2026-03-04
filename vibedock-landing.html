@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VibeDock — Your AI-Powered Business Dock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'Clash';
+  src: url('https://cdn.fontshare.com/wf/AOKBHRIRZV5WJPZYHRB5E5LFPYYGBXAR/7JG7GRPZPMV3TMQYCJDQOVVCZB35QMCB/BFTMVUZCFPGKQY6GC77A5XFQQVDJ5E5W.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Clash';
+  src: url('https://cdn.fontshare.com/wf/AOKBHRIRZV5WJPZYHRB5E5LFPYYGBXAR/BC7YS7HYIIRHXPKNSATBMRIQFWW5Y62X/BFTMVUZCFPGKQY6GC77A5XFQQVDJ5E5W.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --midnight: #060a14;
+  --deep: #0a0f1e;
+  --surface: #111827;
+  --surface-light: #1a2236;
+  --border: rgba(255,255,255,0.06);
+  --border-bright: rgba(255,255,255,0.12);
+  --text: #f1f5f9;
+  --text-dim: #94a3b8;
+  --text-muted: #64748b;
+  --violet: #8b5cf6;
+  --violet-bright: #a78bfa;
+  --blue: #3b82f6;
+  --cyan: #06b6d4;
+  --teal: #14b8a6;
+  --gradient: linear-gradient(135deg, #8b5cf6, #3b82f6, #06b6d4);
+  --gradient-text: linear-gradient(135deg, #c084fc, #60a5fa, #22d3ee);
+  --gradient-reverse: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+  --glow-violet: rgba(139, 92, 246, 0.15);
+  --glow-blue: rgba(59, 130, 246, 0.12);
+  --glow-cyan: rgba(6, 182, 212, 0.1);
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--midnight);
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Instrument Sans', -apple-system, sans-serif;
+  color: var(--text);
+  background: var(--midnight);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════ GLOBAL AMBIENT ═══════════════════════════════ */
+
+.ambient-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  animation: orbFloat 20s ease-in-out infinite;
+}
+
+.orb-1 {
+  width: 600px; height: 600px;
+  background: var(--glow-violet);
+  top: -10%; left: -5%;
+  animation-delay: 0s;
+  animation-duration: 25s;
+}
+.orb-2 {
+  width: 500px; height: 500px;
+  background: var(--glow-blue);
+  top: 40%; right: -10%;
+  animation-delay: -8s;
+  animation-duration: 22s;
+}
+.orb-3 {
+  width: 400px; height: 400px;
+  background: var(--glow-cyan);
+  bottom: -5%; left: 30%;
+  animation-delay: -15s;
+  animation-duration: 28s;
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(40px, -30px) scale(1.05); }
+  50% { transform: translate(-20px, 20px) scale(0.95); }
+  75% { transform: translate(30px, 40px) scale(1.02); }
+}
+
+/* Grid overlay */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ═══════════════════════════════ SCROLL REVEAL ═══════════════════════════════ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+.reveal-delay-5 { transition-delay: 0.5s; }
+.reveal-delay-6 { transition-delay: 0.6s; }
+
+/* ═══════════════════════════════ TYPOGRAPHY ═══════════════════════════════ */
+
+.clash { font-family: 'Clash', 'Instrument Sans', sans-serif; }
+
+.gradient-text {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--violet-bright);
+  margin-bottom: 1.5rem;
+  display: inline-block;
+}
+
+/* ═══════════════════════════════ LAYOUT ═══════════════════════════════ */
+
+section {
+  position: relative;
+  z-index: 2;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* ═══════════════════════════════ NAV ═══════════════════════════════ */
+
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 1.25rem 2rem;
+  transition: all 0.4s ease;
+}
+
+nav.scrolled {
+  background: rgba(6, 10, 20, 0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nav-logo {
+  font-family: 'Clash', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--text); }
+
+.nav-cta {
+  background: var(--gradient);
+  color: white !important;
+  padding: 0.6rem 1.5rem;
+  border-radius: 100px;
+  font-weight: 600 !important;
+  transition: opacity 0.3s, transform 0.3s !important;
+}
+.nav-cta:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* ═══════════════════════════════ HERO ═══════════════════════════════ */
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8rem 2rem 6rem;
+  position: relative;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--violet-bright);
+  margin-bottom: 2.5rem;
+  animation: heroFadeIn 1s ease 0.2s both;
+}
+
+.hero-badge .dot {
+  width: 6px; height: 6px;
+  background: var(--violet-bright);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.hero h1 {
+  font-family: 'Clash', sans-serif;
+  font-weight: 700;
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+  animation: heroFadeIn 1s ease 0.4s both;
+}
+
+.hero-sub {
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  color: var(--text-dim);
+  max-width: 600px;
+  margin: 0 auto 3rem;
+  line-height: 1.7;
+  animation: heroFadeIn 1s ease 0.6s both;
+}
+
+@keyframes heroFadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* URL Input */
+.url-input-wrap {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border-bright);
+  border-radius: 100px;
+  padding: 0.4rem 0.4rem 0.4rem 1.5rem;
+  max-width: 520px;
+  width: 100%;
+  margin: 0 auto;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  animation: heroFadeIn 1s ease 0.8s both;
+}
+
+.url-input-wrap:focus-within {
+  border-color: rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.08), 0 0 40px rgba(139, 92, 246, 0.06);
+}
+
+.url-globe {
+  color: var(--text-muted);
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+}
+
+.url-input-wrap input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 1rem;
+  font-family: inherit;
+  min-width: 0;
+}
+.url-input-wrap input::placeholder { color: var(--text-muted); }
+
+.url-btn {
+  background: var(--gradient);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.75rem;
+  border-radius: 100px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.3s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.url-btn:hover { opacity: 0.92; transform: scale(1.02); }
+
+.hero-trust {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  animation: heroFadeIn 1s ease 1s both;
+}
+.hero-trust .sep { opacity: 0.3; }
+
+/* ═══════════════════════════════ PROBLEM SECTION ═══════════════════════════════ */
+
+.problem {
+  padding: 10rem 2rem;
+  text-align: center;
+}
+
+.problem-stats {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 3rem;
+  align-items: center;
+  max-width: 900px;
+  margin: 0 auto 4rem;
+}
+
+.stat-card {
+  padding: 3rem 2rem;
+  border-radius: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  backdrop-filter: blur(12px);
+}
+
+.stat-card > * { position: relative; z-index: 1; }
+
+.stat-number {
+  font-family: 'Clash', sans-serif;
+  font-size: clamp(3rem, 5vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+}
+
+.stat-label {
+  font-size: 1rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.stat-era {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.stat-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+}
+
+.stat-divider-line {
+  width: 1px;
+  height: 60px;
+  background: linear-gradient(to bottom, transparent, var(--border-bright), transparent);
+}
+
+.problem-text {
+  max-width: 680px;
+  margin: 0 auto;
+  font-size: 1.2rem;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+
+.problem-text strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════ DOCK SECTION ═══════════════════════════════ */
+
+.dock-section {
+  padding: 8rem 2rem 10rem;
+}
+
+.dock-section h2 {
+  font-family: 'Clash', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.dock-section .section-sub {
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 1.15rem;
+  max-width: 550px;
+  margin: 0 auto 5rem;
+}
+
+/* The Dock Bar */
+.dock-bar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  max-width: 740px;
+  margin: 0 auto 5rem;
+  position: relative;
+}
+
+.dock-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.dock-icon:hover {
+  transform: translateY(-8px) scale(1.15);
+}
+
+.dock-icon:hover .dock-icon-bg {
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.2);
+}
+
+.dock-icon-bg {
+  width: 64px; height: 64px;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.3s, background 0.3s;
+  position: relative;
+}
+
+.dock-icon-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-align: center;
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+.dock-icon:hover .dock-icon-label { color: var(--text); }
+
+.dock-icon .pro-badge {
+  position: absolute;
+  top: -6px; right: -6px;
+  background: var(--gradient);
+  color: white;
+  font-size: 0.5rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 4px;
+  letter-spacing: 0.1em;
+  z-index: 2;
+}
+
+.dock-icon .dock-dot {
+  width: 4px; height: 4px;
+  background: var(--violet-bright);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s;
+  position: absolute;
+  bottom: -4px;
+}
+.dock-icon.active .dock-dot,
+.dock-icon:hover .dock-dot { opacity: 1; }
+
+/* Tool detail cards */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.tool-card {
+  padding: 2.25rem;
+  border-radius: 1.25rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  transition: border-color 0.4s, transform 0.4s, box-shadow 0.4s;
+  position: relative;
+  overflow: hidden;
+}
+
+.tool-card:hover {
+  border-color: var(--border-bright);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+}
+
+.tool-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 2px;
+  border-radius: 2px 2px 0 0;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.tool-card:hover::after { opacity: 1; }
+
+.tool-card.violet::after { background: var(--gradient); }
+.tool-card.blue::after { background: linear-gradient(90deg, #3b82f6, #06b6d4); }
+.tool-card.cyan::after { background: linear-gradient(90deg, #06b6d4, #14b8a6); }
+
+.tool-card-icon {
+  width: 48px; height: 48px;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.tool-card h3 {
+  font-family: 'Clash', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tool-card h3 .pro-inline {
+  font-size: 0.55rem;
+  font-weight: 700;
+  background: var(--gradient);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.1em;
+  font-family: 'Instrument Sans', sans-serif;
+  vertical-align: middle;
+}
+
+.tool-card p {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════ HOW IT WORKS ═══════════════════════════════ */
+
+.how-section {
+  padding: 8rem 2rem 10rem;
+  text-align: center;
+}
+
+.how-section h2 {
+  font-family: 'Clash', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.how-section .section-sub {
+  color: var(--text-dim);
+  font-size: 1.15rem;
+  max-width: 480px;
+  margin: 0 auto 5rem;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Connector line */
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 80px;
+  left: calc(16.66% + 1rem);
+  right: calc(16.66% + 1rem);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-bright), var(--violet), var(--border-bright), transparent);
+}
+
+.step {
+  text-align: center;
+  position: relative;
+}
+
+.step-num {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border-bright);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-family: 'Clash', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--violet-bright);
+  position: relative;
+  z-index: 2;
+}
+
+.step-visual {
+  width: 100%;
+  height: 180px;
+  border-radius: 1rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.step h3 {
+  font-family: 'Clash', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.step p {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Step visual interiors */
+.step-url-mock {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface-light);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.step-colors {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+.step-color-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  animation: colorPulse 3s ease-in-out infinite;
+}
+.step-color-dot:nth-child(1) { background: #8b5cf6; animation-delay: 0s; }
+.step-color-dot:nth-child(2) { background: #3b82f6; animation-delay: 0.5s; }
+.step-color-dot:nth-child(3) { background: #06b6d4; animation-delay: 1s; }
+.step-color-dot:nth-child(4) { background: #10b981; animation-delay: 1.5s; }
+.step-color-dot:nth-child(5) { background: #f59e0b; animation-delay: 2s; }
+
+@keyframes colorPulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+.step-crm-mock {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  width: 100%;
+}
+.step-crm-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.step-crm-col-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.15rem;
+}
+.step-crm-card-mini {
+  height: 22px;
+  border-radius: 4px;
+  background: rgba(139, 92, 246, 0.15);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+.step-crm-card-mini:nth-child(3) { background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.2); }
+.step-crm-card-mini:nth-child(4) { background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.15); }
+
+/* ═══════════════════════════════ PRICING ═══════════════════════════════ */
+
+.pricing {
+  padding: 8rem 2rem 10rem;
+  text-align: center;
+}
+
+.pricing h2 {
+  font-family: 'Clash', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.pricing .section-sub {
+  color: var(--text-dim);
+  font-size: 1.15rem;
+  max-width: 500px;
+  margin: 0 auto 3rem;
+}
+
+/* Toggle */
+.billing-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 3.5rem;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.toggle-track {
+  width: 48px; height: 26px;
+  background: var(--surface-light);
+  border: 1px solid var(--border-bright);
+  border-radius: 100px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.3s;
+}
+
+.toggle-track.active {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: rgba(139, 92, 246, 0.4);
+}
+
+.toggle-thumb {
+  width: 20px; height: 20px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px; left: 2px;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toggle-track.active .toggle-thumb {
+  transform: translateX(22px);
+}
+
+.save-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--teal);
+  background: rgba(20, 184, 166, 0.1);
+  padding: 3px 8px;
+  border-radius: 100px;
+  border: 1px solid rgba(20, 184, 166, 0.2);
+}
+
+/* Cards */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  max-width: 780px;
+  margin: 0 auto 3rem;
+}
+
+.price-card {
+  padding: 2.5rem;
+  border-radius: 1.5rem;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+  text-align: left;
+  position: relative;
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+
+.price-card:hover {
+  border-color: var(--border-bright);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.price-card.featured {
+  border-color: rgba(139, 92, 246, 0.3);
+  background: rgba(139, 92, 246, 0.05);
+}
+.price-card.featured:hover {
+  border-color: rgba(139, 92, 246, 0.5);
+  box-shadow: 0 20px 60px rgba(139, 92, 246, 0.1);
+}
+
+.popular-badge {
+  position: absolute;
+  top: -12px; right: 1.5rem;
+  background: var(--gradient);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 100px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.price-card h3 {
+  font-family: 'Clash', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.price-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.price-dollar {
+  font-family: 'Clash', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.price-period {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.price-annual {
+  font-size: 0.8rem;
+  color: var(--teal);
+  margin-bottom: 1.5rem;
+  min-height: 1.2rem;
+}
+
+.price-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 2rem;
+}
+
+.price-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+
+.price-features li svg { color: var(--teal); flex-shrink: 0; }
+
+.price-btn {
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 0.75rem;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: block;
+  text-align: center;
+}
+
+.price-btn.primary {
+  background: var(--gradient);
+  color: white;
+}
+.price-btn.primary:hover { opacity: 0.9; transform: translateY(-2px); }
+
+.price-btn.secondary {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border: 1px solid var(--border-bright);
+}
+.price-btn.secondary:hover { background: rgba(255,255,255,0.1); }
+
+/* Subscribe & Keep */
+.subscribe-keep {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-radius: 1rem;
+  background: rgba(20, 184, 166, 0.04);
+  border: 1px solid rgba(20, 184, 166, 0.12);
+  text-align: center;
+}
+
+.subscribe-keep h4 {
+  font-family: 'Clash', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--teal);
+}
+
+.subscribe-keep p {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════ SOCIAL PROOF ═══════════════════════════════ */
+
+.proof {
+  padding: 6rem 2rem 8rem;
+  text-align: center;
+}
+
+.proof-items {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.proof-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.proof-icon {
+  width: 48px; height: 48px;
+  border-radius: 0.75rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+  color: var(--violet-bright);
+}
+
+.proof-num {
+  font-family: 'Clash', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.proof-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  max-width: 140px;
+}
+
+/* ═══════════════════════════════ FINAL CTA ═══════════════════════════════ */
+
+.final-cta {
+  padding: 8rem 2rem 10rem;
+  text-align: center;
+  position: relative;
+}
+
+.final-cta h2 {
+  font-family: 'Clash', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.final-cta .section-sub {
+  color: var(--text-dim);
+  font-size: 1.15rem;
+  max-width: 500px;
+  margin: 0 auto 3rem;
+}
+
+/* ═══════════════════════════════ FOOTER ═══════════════════════════════ */
+
+footer {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid var(--border);
+  padding: 3rem 2rem;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.footer-brand-name {
+  font-family: 'Clash', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.footer-brand-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.footer-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.footer-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.3s;
+}
+.footer-links a:hover { color: var(--text); }
+
+/* ═══════════════════════════════ RESPONSIVE ═══════════════════════════════ */
+
+@media (max-width: 768px) {
+  .problem-stats {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .stat-divider { display: none; }
+  .steps {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  .steps::before { display: none; }
+  .pricing-grid { grid-template-columns: 1fr; }
+  .tools-grid { grid-template-columns: 1fr; }
+  .dock-bar {
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+  }
+  .dock-icon-bg { width: 48px; height: 48px; }
+  .nav-links { display: none; }
+  .footer-inner { flex-direction: column; gap: 1.5rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Ambient Background -->
+<div class="ambient-canvas">
+  <div class="ambient-orb orb-1"></div>
+  <div class="ambient-orb orb-2"></div>
+  <div class="ambient-orb orb-3"></div>
+</div>
+
+<!-- Nav -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">VibeDock</a>
+    <ul class="nav-links">
+      <li><a href="#dock">Tools</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="https://supercrm.manus.space/" class="nav-cta">Try it free</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="dot"></span>
+    Now in open beta
+  </div>
+
+  <h1 class="clash"><span class="gradient-text">VibeDock</span></h1>
+
+  <p class="hero-sub">Your AI&#8209;powered business dock.<br>Drop anything in. Get everything done.</p>
+
+  <form class="url-input-wrap" onsubmit="event.preventDefault(); window.open('https://supercrm.manus.space/', '_blank');">
+    <svg class="url-globe" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+    <input type="text" placeholder="yourcompany.com" />
+    <button type="submit" class="url-btn">
+      Try it free
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    </button>
+  </form>
+
+  <div class="hero-trust">
+    <span>No signup required</span>
+    <span class="sep">·</span>
+    <span>30-second setup</span>
+    <span class="sep">·</span>
+    <span>Your brand, your colors</span>
+  </div>
+</section>
+
+<!-- ═══════════════ THE PROBLEM ═══════════════ -->
+<section class="problem">
+  <div class="container">
+    <span class="section-label reveal">The Parallel</span>
+
+    <div class="problem-stats">
+      <div class="stat-card reveal reveal-delay-1">
+        <div class="stat-era">1998</div>
+        <div class="stat-number gradient-text">32%</div>
+        <div class="stat-label">of iMac buyers had never<br>owned a computer before</div>
+      </div>
+
+      <div class="stat-divider reveal reveal-delay-2">
+        <div class="stat-divider-line"></div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        <div class="stat-divider-line"></div>
+      </div>
+
+      <div class="stat-card reveal reveal-delay-3">
+        <div class="stat-era">2026</div>
+        <div class="stat-number gradient-text">84%</div>
+        <div class="stat-label">of the world has never<br>used AI. Not even once.</div>
+      </div>
+    </div>
+
+    <p class="problem-text reveal reveal-delay-4">
+      The iMac didn't win on specs. It won because it made the internet <strong>effortless</strong>.
+      AI won't reach mainstream adoption because models get smarter. It'll happen when someone
+      builds the thing that makes people say: <strong>"Oh. I get it."</strong>
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════ THE DOCK ═══════════════ -->
+<section class="dock-section" id="dock">
+  <div class="container">
+    <span class="section-label reveal">The Dock</span>
+    <h2 class="reveal reveal-delay-1">Five tools. <span class="gradient-text">One dock.</span></h2>
+    <p class="section-sub reveal reveal-delay-2">Everything a small business needs to run, grow, and close deals &mdash; without the enterprise bloat.</p>
+
+    <!-- Dock Bar -->
+    <div class="dock-bar reveal reveal-delay-3">
+      <div class="dock-icon active">
+        <div class="dock-icon-bg" style="background: rgba(139,92,246,0.15);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <span class="dock-icon-label">Pipeline</span>
+        <span class="dock-dot"></span>
+      </div>
+
+      <div class="dock-icon">
+        <div class="dock-icon-bg" style="background: rgba(59,130,246,0.15);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <span class="dock-icon-label">MagicDrop</span>
+        <span class="dock-dot"></span>
+      </div>
+
+      <div class="dock-icon">
+        <div class="dock-icon-bg" style="background: rgba(6,182,212,0.15);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+        </div>
+        <span class="dock-icon-label">SpellCaster</span>
+        <span class="dock-dot"></span>
+        <span class="pro-badge">PRO</span>
+      </div>
+
+      <div class="dock-icon">
+        <div class="dock-icon-bg" style="background: rgba(139,92,246,0.1);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <span class="dock-icon-label">AI Chat</span>
+        <span class="dock-dot"></span>
+      </div>
+
+      <div class="dock-icon">
+        <div class="dock-icon-bg" style="background: rgba(20,184,166,0.12);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+        </div>
+        <span class="dock-icon-label">Command</span>
+        <span class="dock-dot"></span>
+        <span class="pro-badge">PRO</span>
+      </div>
+    </div>
+
+    <!-- Tool Cards -->
+    <div class="tools-grid">
+      <div class="tool-card violet reveal reveal-delay-1">
+        <div class="tool-card-icon" style="background: rgba(139,92,246,0.12);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        <h3>CRM Pipeline</h3>
+        <p>Drag-and-drop deals across stages. See your entire pipeline at a glance. No data entry required.</p>
+      </div>
+
+      <div class="tool-card blue reveal reveal-delay-2">
+        <div class="tool-card-icon" style="background: rgba(59,130,246,0.12);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </div>
+        <h3>MagicDrop</h3>
+        <p>Drop anything in. Files, URLs, business cards, voice memos. AI extracts contacts, deals, and tasks automatically.</p>
+      </div>
+
+      <div class="tool-card cyan reveal reveal-delay-3">
+        <div class="tool-card-icon" style="background: rgba(6,182,212,0.12);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+        </div>
+        <h3>SpellCaster <span class="pro-inline">PRO</span></h3>
+        <p>One shower thought becomes posts for LinkedIn, X, Instagram, email, and blog. Your content engine.</p>
+      </div>
+
+      <div class="tool-card violet reveal reveal-delay-4">
+        <div class="tool-card-icon" style="background: rgba(139,92,246,0.08);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3>AI Assistant</h3>
+        <p>Ask questions about your pipeline in plain English. Get instant answers, suggestions, and next steps.</p>
+      </div>
+
+      <div class="tool-card blue reveal reveal-delay-5">
+        <div class="tool-card-icon" style="background: rgba(20,184,166,0.1);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2dd4bf" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+        </div>
+        <h3>Command Center <span class="pro-inline">PRO</span></h3>
+        <p>Daily briefing. Pipeline digest. Priority matrix. Know exactly what matters every morning.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ HOW IT WORKS ═══════════════ -->
+<section class="how-section" id="how">
+  <div class="container">
+    <span class="section-label reveal">How It Works</span>
+    <h2 class="reveal reveal-delay-1">Three steps. <span class="gradient-text">Thirty seconds.</span></h2>
+    <p class="section-sub reveal reveal-delay-2">Enter your website. Watch the magic. Start closing deals.</p>
+
+    <div class="steps">
+      <div class="step reveal reveal-delay-2">
+        <div class="step-num">1</div>
+        <div class="step-visual">
+          <div class="step-url-mock">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/></svg>
+            yourcompany.com
+          </div>
+        </div>
+        <h3>Enter your website</h3>
+        <p>Just type your URL. That&rsquo;s the only input we need.</p>
+      </div>
+
+      <div class="step reveal reveal-delay-3">
+        <div class="step-num">2</div>
+        <div class="step-visual">
+          <div class="step-colors">
+            <div class="step-color-dot"></div>
+            <div class="step-color-dot"></div>
+            <div class="step-color-dot"></div>
+            <div class="step-color-dot"></div>
+            <div class="step-color-dot"></div>
+          </div>
+        </div>
+        <h3>Watch your brand come alive</h3>
+        <p>We extract your colors, logo, and industry. Your CRM materializes in your brand.</p>
+      </div>
+
+      <div class="step reveal reveal-delay-4">
+        <div class="step-num">3</div>
+        <div class="step-visual">
+          <div class="step-crm-mock">
+            <div class="step-crm-col">
+              <div class="step-crm-col-label">Lead</div>
+              <div class="step-crm-card-mini"></div>
+              <div class="step-crm-card-mini"></div>
+              <div class="step-crm-card-mini"></div>
+            </div>
+            <div class="step-crm-col">
+              <div class="step-crm-col-label">Qualified</div>
+              <div class="step-crm-card-mini"></div>
+              <div class="step-crm-card-mini"></div>
+            </div>
+            <div class="step-crm-col">
+              <div class="step-crm-col-label">Proposal</div>
+              <div class="step-crm-card-mini"></div>
+            </div>
+            <div class="step-crm-col">
+              <div class="step-crm-col-label">Won</div>
+              <div class="step-crm-card-mini"></div>
+              <div class="step-crm-card-mini"></div>
+            </div>
+          </div>
+        </div>
+        <h3>Start closing deals</h3>
+        <p>Your pipeline is ready. Drop in contacts, deals, and files. AI handles the rest.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PRICING ═══════════════ -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <span class="section-label reveal">Pricing</span>
+    <h2 class="reveal reveal-delay-1">Simple. <span class="gradient-text">Honest.</span></h2>
+    <p class="section-sub reveal reveal-delay-2">No hidden fees. No per-seat pricing. No surprises.</p>
+
+    <div class="billing-toggle reveal reveal-delay-3">
+      <span id="monthly-label" style="color: var(--text);">Monthly</span>
+      <div class="toggle-track" id="billingToggle" onclick="toggleBilling()">
+        <div class="toggle-thumb"></div>
+      </div>
+      <span id="annual-label">Annual</span>
+      <span class="save-badge">Save 20%</span>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="price-card reveal reveal-delay-3">
+        <h3>VibeDock Lite</h3>
+        <div class="price-amount">
+          <span class="price-dollar" id="lite-price">$75</span>
+          <span class="price-period">/mo</span>
+        </div>
+        <div class="price-annual" id="lite-annual"></div>
+        <ul class="price-features">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> CRM Pipeline &amp; Contacts</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> MagicDrop intake</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> AI Assistant</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Personalized onboarding</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Up to 10 seats</li>
+        </ul>
+        <a href="https://supercrm.manus.space/" class="price-btn secondary">Get started</a>
+      </div>
+
+      <div class="price-card featured reveal reveal-delay-4">
+        <div class="popular-badge">MOST POPULAR</div>
+        <h3>VibeDock Pro</h3>
+        <div class="price-amount">
+          <span class="price-dollar" id="pro-price">$150</span>
+          <span class="price-period">/mo</span>
+        </div>
+        <div class="price-annual" id="pro-annual"></div>
+        <ul class="price-features">
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Everything in Lite</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> SpellCaster content engine</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Command Center</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Priority Matrix</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Advanced MagicDrop</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Legal Helper</li>
+        </ul>
+        <a href="https://supercrm.manus.space/" class="price-btn primary">Get started</a>
+      </div>
+    </div>
+
+    <div class="subscribe-keep reveal reveal-delay-5">
+      <h4>Subscribe &amp; Keep</h4>
+      <p>Lock in your price forever. As we grow, features get added, and the price goes up for new subscribers &mdash; but your rate stays the same. That&rsquo;s your reward for believing early.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SOCIAL PROOF ═══════════════ -->
+<section class="proof">
+  <div class="container">
+    <div class="proof-items">
+      <div class="proof-item reveal reveal-delay-1">
+        <div class="proof-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <div class="proof-num">10,700+</div>
+        <div class="proof-label">LinkedIn impressions on launch article</div>
+      </div>
+
+      <div class="proof-item reveal reveal-delay-2">
+        <div class="proof-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        </div>
+        <div class="proof-num">ASU</div>
+        <div class="proof-label">W.P. Carey Small Business Summit presenter</div>
+      </div>
+
+      <div class="proof-item reveal reveal-delay-3">
+        <div class="proof-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+        </div>
+        <div class="proof-num">1,060%</div>
+        <div class="proof-label">Impressions increase in 4 days using our own tools</div>
+      </div>
+
+      <div class="proof-item reveal reveal-delay-4">
+        <div class="proof-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <div class="proof-num">Zero-trust</div>
+        <div class="proof-label">7-layer security on all content intake</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FINAL CTA ═══════════════ -->
+<section class="final-cta">
+  <div class="container">
+    <span class="section-label reveal">Your Move</span>
+    <h2 class="reveal reveal-delay-1">Your <span class="gradient-text">iMac moment</span> starts here.</h2>
+    <p class="section-sub reveal reveal-delay-2">Enter your website. See your CRM materialize in your brand. No signup. No credit card. Just results.</p>
+
+    <form class="url-input-wrap reveal reveal-delay-3" onsubmit="event.preventDefault(); window.open('https://supercrm.manus.space/', '_blank');">
+      <svg class="url-globe" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      <input type="text" placeholder="yourcompany.com" />
+      <button type="submit" class="url-btn">
+        Try it free
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+    </form>
+
+    <div class="hero-trust reveal reveal-delay-4">
+      <span>No signup required</span>
+      <span class="sep">·</span>
+      <span>30-second setup</span>
+      <span class="sep">·</span>
+      <span>Your brand, your colors</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-brand-name clash">VibeDock</span>
+      <span class="footer-brand-sub">by WayLucid</span>
+    </div>
+    <ul class="footer-links">
+      <li><a href="https://supercrm.manus.space/">Demo</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#dock">Tools</a></li>
+      <li><a href="mailto:hello@waylucid.com">Contact</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+// Billing toggle
+let isAnnual = false;
+function toggleBilling() {
+  isAnnual = !isAnnual;
+  const toggle = document.getElementById('billingToggle');
+  const litePrice = document.getElementById('lite-price');
+  const proPrice = document.getElementById('pro-price');
+  const liteAnnual = document.getElementById('lite-annual');
+  const proAnnual = document.getElementById('pro-annual');
+  const monthlyLabel = document.getElementById('monthly-label');
+  const annualLabel = document.getElementById('annual-label');
+
+  toggle.classList.toggle('active', isAnnual);
+
+  if (isAnnual) {
+    litePrice.textContent = '$60';
+    proPrice.textContent = '$120';
+    liteAnnual.textContent = '$720/year — save $180';
+    proAnnual.textContent = '$1,440/year — save $360';
+    monthlyLabel.style.color = 'var(--text-muted)';
+    annualLabel.style.color = 'var(--text)';
+  } else {
+    litePrice.textContent = '$75';
+    proPrice.textContent = '$150';
+    liteAnnual.textContent = '';
+    proAnnual.textContent = '';
+    monthlyLabel.style.color = 'var(--text)';
+    annualLabel.style.color = 'var(--text-dim)';
+  }
+}
+</script>
+
+</body>
+</html>
