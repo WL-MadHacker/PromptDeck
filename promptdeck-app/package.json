@@ -1,0 +1,14 @@
+{
+  "name": "promptdeck",
+  "version": "1.0.0",
+  "description": "A prompt clipboard manager for quick copy-paste of repetitive prompts",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-packager . PromptDeck --platform=win32 --arch=x64 --out=dist --overwrite --icon=icon.ico --asar"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-packager": "^17.1.2"
+  }
+}
