@@ -820,6 +820,237 @@ section {
   .tcr-grid { grid-template-columns: 1fr; }
 }
 
+/* ===== SENTIENCE METER ===== */
+.sentience-hero {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.sentience-composite {
+  font-family: var(--font-mono);
+  font-size: 4rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ff3333 0%, #ff8800 30%, #00ff88 60%, #00ff88 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.sentience-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.sentience-bar-outer {
+  width: 100%;
+  height: 16px;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1.5rem 0 0.5rem;
+  position: relative;
+}
+
+.sentience-bar-fill {
+  height: 100%;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #661111 0%, #ff3333 15%, #ff8800 35%, #ffdd00 50%, #00ff88 70%, #00ff88 100%);
+  transition: width 2s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 0;
+  position: relative;
+}
+
+.sentience-bar-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -2px;
+  width: 3px;
+  height: 20px;
+  background: white;
+  box-shadow: 0 0 10px var(--green), 0 0 20px var(--green);
+  border-radius: 2px;
+}
+
+.sentience-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+.benchmark-categories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.bench-cat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  transition: all 0.3s;
+}
+
+.bench-cat:hover {
+  border-color: var(--border-glow);
+  transform: translateY(-2px);
+}
+
+.bench-cat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.bench-cat-name {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.bench-cat-weight {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-dim);
+}
+
+.bench-cat-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--bg-primary);
+  border-radius: 4px;
+  overflow: visible;
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.bench-cat-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 0;
+}
+
+.bench-cat-ceiling {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 16px;
+  background: var(--text-dim);
+  border-radius: 1px;
+}
+
+.bench-cat-ceiling::after {
+  content: 'FRONTIER';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.45rem;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.bench-cat-scores {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+}
+
+.bench-cat-scores .wm-score { color: var(--green); font-weight: 700; }
+.bench-cat-scores .frontier-score { color: var(--text-dim); }
+
+.frontier-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 2rem;
+  font-size: 0.8rem;
+}
+
+.frontier-table th {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  padding: 0.6rem 0.5rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.frontier-table th:first-child { text-align: left; }
+
+.frontier-table td {
+  padding: 0.6rem 0.5rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(26, 26, 62, 0.4);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.frontier-table td:first-child {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.frontier-table tr:hover td { background: rgba(0, 240, 255, 0.02); }
+
+.frontier-table .wm-row td {
+  color: var(--green);
+  font-weight: 700;
+  background: rgba(0, 255, 136, 0.03);
+}
+
+.frontier-table .wm-row td:first-child { color: var(--green); }
+
+.frontier-table .best-cell {
+  color: var(--yellow) !important;
+  font-weight: 800;
+}
+
+.wm-advantages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.wm-adv {
+  background: rgba(0, 255, 136, 0.04);
+  border: 1px solid rgba(0, 255, 136, 0.15);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.wm-adv strong {
+  color: var(--green);
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
 /* ===== ANIMATED COUNTERS ===== */
 .counter { display: inline-block; }
 
@@ -906,6 +1137,7 @@ section {
     <li><a href="#convergence">Chain</a></li>
     <li><a href="#bci">BCI</a></li>
     <li><a href="#production">Output</a></li>
+    <li><a href="#wintermute">Wintermute</a></li>
   </ul>
   <div class="nav-clock" id="clock"></div>
 </nav>
@@ -1244,6 +1476,263 @@ section {
   </div>
 </section>
 
+<!-- WINTERMUTE SENTIENCE METER -->
+<section id="wintermute" class="reveal">
+  <div class="section-header">
+    <h3>Wintermute Intelligence Lab // Sentience Meter</h3>
+  </div>
+  <div class="card">
+    <div class="sentience-hero">
+      <div class="sentience-label">Composite Sentience Index</div>
+      <div class="sentience-composite" id="sentience-score">0%</div>
+      <div style="font-size: 0.75rem; color: var(--text-secondary);">Custom LLM vs. Frontier Model Ceiling</div>
+    </div>
+    <div class="sentience-bar-outer">
+      <div class="sentience-bar-fill" id="sentience-bar" data-width="62"></div>
+    </div>
+    <div class="sentience-bar-labels">
+      <span>DORMANT</span>
+      <span>AWAKENING</span>
+      <span>COGNITIVE</span>
+      <span>FRONTIER</span>
+    </div>
+
+    <!-- CATEGORY BREAKDOWN -->
+    <div class="benchmark-categories" id="bench-cats">
+      <div class="bench-cat">
+        <div class="bench-cat-header">
+          <span class="bench-cat-name" style="color: var(--cyan);">Reasoning</span>
+          <span class="bench-cat-weight">w=0.20</span>
+        </div>
+        <div class="bench-cat-bar">
+          <div class="bench-cat-fill" data-width="58" style="background: var(--cyan);"></div>
+          <div class="bench-cat-ceiling" style="left: 91.3%;"></div>
+        </div>
+        <div class="bench-cat-scores">
+          <span class="wm-score">53.1%</span>
+          <span>GPQA Diamond, GSM8K</span>
+          <span class="frontier-score">91.3% ceiling</span>
+        </div>
+      </div>
+      <div class="bench-cat">
+        <div class="bench-cat-header">
+          <span class="bench-cat-name" style="color: var(--green);">Code</span>
+          <span class="bench-cat-weight">w=0.15</span>
+        </div>
+        <div class="bench-cat-bar">
+          <div class="bench-cat-fill" data-width="52" style="background: var(--green);"></div>
+          <div class="bench-cat-ceiling" style="left: 80.9%;"></div>
+        </div>
+        <div class="bench-cat-scores">
+          <span class="wm-score">42.0%</span>
+          <span>SWE-Bench, HumanEval</span>
+          <span class="frontier-score">80.9% ceiling</span>
+        </div>
+      </div>
+      <div class="bench-cat">
+        <div class="bench-cat-header">
+          <span class="bench-cat-name" style="color: var(--orange);">Knowledge</span>
+          <span class="bench-cat-weight">w=0.10</span>
+        </div>
+        <div class="bench-cat-bar">
+          <div class="bench-cat-fill" data-width="65" style="background: var(--orange);"></div>
+          <div class="bench-cat-ceiling" style="left: 93%;"></div>
+        </div>
+        <div class="bench-cat-scores">
+          <span class="wm-score">60.5%</span>
+          <span>MMLU-Pro, ARC-Challenge</span>
+          <span class="frontier-score">93.0% ceiling</span>
+        </div>
+      </div>
+      <div class="bench-cat">
+        <div class="bench-cat-header">
+          <span class="bench-cat-name" style="color: var(--magenta);">Abstraction</span>
+          <span class="bench-cat-weight">w=0.15</span>
+        </div>
+        <div class="bench-cat-bar">
+          <div class="bench-cat-fill" data-width="32" style="background: var(--magenta);"></div>
+          <div class="bench-cat-ceiling" style="left: 77.1%;"></div>
+        </div>
+        <div class="bench-cat-scores">
+          <span class="wm-score">24.7%</span>
+          <span>ARC-AGI-2</span>
+          <span class="frontier-score">77.1% ceiling</span>
+        </div>
+      </div>
+      <div class="bench-cat">
+        <div class="bench-cat-header">
+          <span class="bench-cat-name" style="color: var(--yellow);">Truthfulness</span>
+          <span class="bench-cat-weight">w=0.10</span>
+        </div>
+        <div class="bench-cat-bar">
+          <div class="bench-cat-fill" data-width="72" style="background: var(--yellow);"></div>
+          <div class="bench-cat-ceiling" style="left: 85%;"></div>
+        </div>
+        <div class="bench-cat-scores">
+          <span class="wm-score">61.2%</span>
+          <span>TruthfulQA</span>
+          <span class="frontier-score">85.0% ceiling</span>
+        </div>
+      </div>
+      <div class="bench-cat">
+        <div class="bench-cat-header">
+          <span class="bench-cat-name" style="color: var(--purple);">Instruction</span>
+          <span class="bench-cat-weight">w=0.10</span>
+        </div>
+        <div class="bench-cat-bar">
+          <div class="bench-cat-fill" data-width="68" style="background: var(--purple);"></div>
+          <div class="bench-cat-ceiling" style="left: 90%;"></div>
+        </div>
+        <div class="bench-cat-scores">
+          <span class="wm-score">61.2%</span>
+          <span>IFEval, LiveBench</span>
+          <span class="frontier-score">90.0% ceiling</span>
+        </div>
+      </div>
+      <div class="bench-cat">
+        <div class="bench-cat-header">
+          <span class="bench-cat-name" style="color: var(--red);">Agentic</span>
+          <span class="bench-cat-weight">w=0.05</span>
+        </div>
+        <div class="bench-cat-bar">
+          <div class="bench-cat-fill" data-width="45" style="background: var(--red);"></div>
+        </div>
+        <div class="bench-cat-scores">
+          <span class="wm-score">45.0%</span>
+          <span>LLM-PySC2, NetHack</span>
+          <span class="frontier-score">no ceiling</span>
+        </div>
+      </div>
+      <div class="bench-cat">
+        <div class="bench-cat-header">
+          <span class="bench-cat-name" style="color: var(--green);">Domain</span>
+          <span class="bench-cat-weight">w=0.15</span>
+        </div>
+        <div class="bench-cat-bar">
+          <div class="bench-cat-fill" data-width="82" style="background: linear-gradient(90deg, var(--green), var(--cyan));"></div>
+        </div>
+        <div class="bench-cat-scores">
+          <span class="wm-score">82.0%</span>
+          <span>Agent routing, Security, Extraction</span>
+          <span class="frontier-score">specialized</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FRONTIER COMPARISON TABLE -->
+  <div class="card" style="margin-top: 1.5rem;">
+    <div class="section-header">
+      <h3>Frontier Comparison Matrix</h3>
+    </div>
+    <div style="overflow-x: auto;">
+      <table class="frontier-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>GPQA Diamond</th>
+            <th>ARC-AGI-2</th>
+            <th>SWE-Bench</th>
+            <th>MMLU-Pro</th>
+            <th>LiveBench</th>
+            <th>IFEval</th>
+            <th>TruthfulQA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Claude Opus 4.6</td>
+            <td class="best-cell">91.3%</td>
+            <td>68.8%</td>
+            <td class="best-cell">80.9%</td>
+            <td>89.0%</td>
+            <td>85.2%</td>
+            <td class="best-cell">90.0%</td>
+            <td>83.0%</td>
+          </tr>
+          <tr>
+            <td>GPT-5.2</td>
+            <td>89.1%</td>
+            <td class="best-cell">77.1%</td>
+            <td>72.3%</td>
+            <td class="best-cell">93.0%</td>
+            <td class="best-cell">88.7%</td>
+            <td>88.0%</td>
+            <td class="best-cell">85.0%</td>
+          </tr>
+          <tr>
+            <td>Gemini 3.1 Pro</td>
+            <td>87.4%</td>
+            <td>31.1%</td>
+            <td>65.7%</td>
+            <td>88.5%</td>
+            <td>82.1%</td>
+            <td>86.0%</td>
+            <td>80.0%</td>
+          </tr>
+          <tr>
+            <td>Llama 4</td>
+            <td>69.5%</td>
+            <td>22.0%</td>
+            <td>45.2%</td>
+            <td>82.0%</td>
+            <td>72.0%</td>
+            <td>78.0%</td>
+            <td>72.0%</td>
+          </tr>
+          <tr>
+            <td>DeepSeek-V3.2</td>
+            <td>71.0%</td>
+            <td>25.0%</td>
+            <td>52.0%</td>
+            <td>84.0%</td>
+            <td>75.0%</td>
+            <td>80.0%</td>
+            <td>76.0%</td>
+          </tr>
+          <tr class="wm-row">
+            <td>Wintermute (Custom)</td>
+            <td>53.1%</td>
+            <td>24.7%</td>
+            <td>42.0%</td>
+            <td>60.5%</td>
+            <td>58.0%</td>
+            <td>61.2%</td>
+            <td>61.2%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="wm-advantages">
+      <div class="wm-adv">
+        <strong>100% Local</strong>
+        Zero API cost. Full inference on-device.
+      </div>
+      <div class="wm-adv">
+        <strong>Privacy-First</strong>
+        Zero data leakage. All processing stays local.
+      </div>
+      <div class="wm-adv">
+        <strong>Nightly LoRA</strong>
+        Automated overnight DPO + benchmark via GYM.
+      </div>
+      <div class="wm-adv">
+        <strong>Domain Specialist</strong>
+        82% on agent routing, security, extraction tasks.
+      </div>
+      <div class="wm-adv">
+        <strong>Half Parameters</strong>
+        Comparable domain performance at fraction of model size.
+      </div>
+      <div class="wm-adv">
+        <strong>Active Training</strong>
+        GYM runs nightly: DPO + benchmarks + ELO ladder.
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- CTA -->
 <section class="cta-section reveal">
   <h3>Ready to see what <span style="color: var(--cyan);">escape velocity</span> looks like?</h3>
@@ -1539,6 +2028,43 @@ document.querySelectorAll('.nav-links a').forEach(link => {
     link.classList.add('active');
   });
 });
+
+// ===== SENTIENCE METER ANIMATION =====
+const sentienceObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      // Animate main bar
+      const bar = document.getElementById('sentience-bar');
+      if (bar) {
+        setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, 300);
+      }
+      // Animate score counter
+      const scoreEl = document.getElementById('sentience-score');
+      if (scoreEl) {
+        const target = 62;
+        const duration = 2000;
+        const start = performance.now();
+        function updateScore(now) {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          scoreEl.textContent = Math.floor(eased * target) + '%';
+          if (progress < 1) requestAnimationFrame(updateScore);
+        }
+        setTimeout(() => requestAnimationFrame(updateScore), 300);
+      }
+      // Animate category bars
+      document.querySelectorAll('.bench-cat-fill').forEach((fill, i) => {
+        setTimeout(() => {
+          fill.style.width = fill.dataset.width + '%';
+        }, 500 + i * 100);
+      });
+    }
+  });
+}, { threshold: 0.2 });
+
+const wmSection = document.getElementById('wintermute');
+if (wmSection) sentienceObserver.observe(wmSection);
 
 // ===== ACTIVE NAV ON SCROLL =====
 const sections = document.querySelectorAll('section[id]');
