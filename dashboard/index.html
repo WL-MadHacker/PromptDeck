@@ -411,6 +411,46 @@ section {
 .chain-link:nth-child(7) .chain-tag { color: var(--cyan); border-color: var(--cyan); }
 .chain-link:nth-child(9) .chain-tag { color: var(--magenta); border-color: var(--magenta); }
 
+/* ===== SPOILER BLUR ===== */
+.spoiler-blur {
+  cursor: pointer;
+  overflow: hidden;
+}
+.spoiler-blur .spoiler-content {
+  filter: blur(8px);
+  -webkit-filter: blur(8px);
+  user-select: none;
+  transition: filter 0.5s ease;
+}
+.spoiler-blur.revealed .spoiler-content {
+  filter: blur(0);
+  -webkit-filter: blur(0);
+  user-select: auto;
+}
+.spoiler-blur .spoiler-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--cyan);
+  background: rgba(10, 10, 26, 0.3);
+  border-radius: 12px;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+.spoiler-blur.revealed .spoiler-overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ===== BCI RADAR ===== */
 .bci-container {
   display: flex;
@@ -521,9 +561,26 @@ section {
 .skill-card:nth-child(7)::after { background: var(--red); }
 
 .skill-icon {
-  font-size: 1.5rem;
-  margin-bottom: 0.5rem;
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border-radius: 8px;
+  border: 1px solid;
 }
+.skill-card:nth-child(1) .skill-icon { color: var(--cyan); border-color: rgba(0,255,255,0.3); background: rgba(0,255,255,0.05); }
+.skill-card:nth-child(2) .skill-icon { color: var(--green); border-color: rgba(0,255,136,0.3); background: rgba(0,255,136,0.05); }
+.skill-card:nth-child(3) .skill-icon { color: var(--orange); border-color: rgba(255,165,0,0.3); background: rgba(255,165,0,0.05); }
+.skill-card:nth-child(4) .skill-icon { color: var(--magenta); border-color: rgba(255,0,128,0.3); background: rgba(255,0,128,0.05); }
+.skill-card:nth-child(5) .skill-icon { color: var(--yellow); border-color: rgba(255,255,0,0.3); background: rgba(255,255,0,0.05); }
+.skill-card:nth-child(6) .skill-icon { color: var(--purple); border-color: rgba(136,0,255,0.3); background: rgba(136,0,255,0.05); }
+.skill-card:nth-child(7) .skill-icon { color: var(--red); border-color: rgba(255,50,50,0.3); background: rgba(255,50,50,0.05); }
 
 .skill-card h4 {
   font-size: 0.8rem;
@@ -569,46 +626,6 @@ section {
 
 .evidence-table tr:hover td {
   background: rgba(0, 240, 255, 0.02);
-}
-
-/* ===== TCR TABLE ===== */
-.tcr-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.tcr-item {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem;
-  transition: all 0.3s;
-}
-
-.tcr-item:hover {
-  border-color: var(--border-glow);
-  transform: translateY(-2px);
-}
-
-.tcr-item h5 {
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: var(--text-primary);
-}
-
-.tcr-item .tcr-val {
-  font-family: var(--font-mono);
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: var(--green);
-  margin-bottom: 0.25rem;
-}
-
-.tcr-item .tcr-detail {
-  font-size: 0.7rem;
-  color: var(--text-secondary);
 }
 
 /* ===== STACK PILLS ===== */
@@ -817,7 +834,7 @@ section {
 @media (max-width: 480px) {
   .metrics-bar { grid-template-columns: repeat(2, 1fr); }
   .skill-grid { grid-template-columns: repeat(2, 1fr); }
-  .tcr-grid { grid-template-columns: 1fr; }
+
 }
 
 /* ===== SENTIENCE METER ===== */
@@ -1136,7 +1153,7 @@ section {
     <li><a href="#velocity">Velocity</a></li>
     <li><a href="#convergence">Chain</a></li>
     <li><a href="#bci">BCI</a></li>
-    <li><a href="#production">Output</a></li>
+    <li><a href="#skills">Skills</a></li>
     <li><a href="#wintermute">Wintermute</a></li>
   </ul>
   <div class="nav-clock" id="clock"></div>
@@ -1153,7 +1170,7 @@ section {
   </h2>
   <p class="hero-sub">
     Solo AI-augmented developer producing 18-36x traditional output velocity.
-    30,000+ LOC production systems. 160+ features. One operator.
+    250,000+ LOC across 21 production systems. 160+ features. One operator.
   </p>
   <div class="hero-formula">
     <span class="var-eq">RP(t)</span> =
@@ -1167,32 +1184,35 @@ section {
     Profile Rarity: ~1 in 1.6M &bull; Tier 6 Classification
   </div>
 
-  <!-- METRICS BAR -->
+  <!-- METRICS BAR (live from GitHub API) -->
   <div class="metrics-bar">
     <div class="metric-hex">
-      <div class="metric-value"><span class="counter" data-target="30367">0</span>+</div>
+      <div class="metric-value"><span class="counter" id="loc-counter" data-target="250236">0</span>+</div>
       <div class="metric-label">Lines of Code</div>
     </div>
     <div class="metric-hex">
-      <div class="metric-value"><span class="counter" data-target="160">0</span>+</div>
-      <div class="metric-label">Features</div>
+      <div class="metric-value"><span class="counter" id="repo-counter" data-target="21">0</span></div>
+      <div class="metric-label">Repos</div>
+    </div>
+    <div class="metric-hex">
+      <div class="metric-value"><span class="counter" id="commit-counter" data-target="427">0</span>+</div>
+      <div class="metric-label">Commits</div>
     </div>
     <div class="metric-hex">
       <div class="metric-value"><span class="counter" data-target="18">0</span>-36x</div>
       <div class="metric-label">Velocity</div>
     </div>
     <div class="metric-hex">
-      <div class="metric-value"><span class="counter" data-target="141">0</span></div>
-      <div class="metric-label">Tests Passing</div>
+      <div class="metric-value"><span class="counter" id="feature-counter" data-target="160">0</span>+</div>
+      <div class="metric-label">Features</div>
     </div>
     <div class="metric-hex">
-      <div class="metric-value">98.8<span style="font-size:0.8em">%</span></div>
-      <div class="metric-label">Completion</div>
-    </div>
-    <div class="metric-hex">
-      <div class="metric-value">$1.4<span style="font-size:0.8em">M</span></div>
+      <div class="metric-value">$<span class="counter" id="value-counter" data-target="3.8" data-decimals="1">0</span><span style="font-size:0.8em">M</span></div>
       <div class="metric-label">Equiv Value/yr</div>
     </div>
+  </div>
+  <div style="text-align:center; margin-top: 0.5rem;">
+    <span id="live-badge" style="font-family:var(--font-mono); font-size:0.55rem; letter-spacing:2px; color:var(--text-dim); opacity:0; transition: opacity 1s;">● LIVE FROM GITHUB</span>
   </div>
 </section>
 
@@ -1258,11 +1278,14 @@ section {
       <span class="chain-tag">Skill Build</span>
     </div>
     <div class="chain-arrow">&rarr;</div>
-    <div class="chain-link">
-      <div class="chain-num">Link 03</div>
-      <h4>Pattern Recognition</h4>
-      <p>Web3 early adoption. BTC ~$300, ETH ~$140. Validated paradigm recognition before mainstream consensus.</p>
-      <span class="chain-tag">Validated</span>
+    <div class="chain-link spoiler-blur" onclick="this.classList.toggle('revealed')" title="Click to reveal">
+      <div class="spoiler-overlay">[ CLICK TO REVEAL ]</div>
+      <div class="spoiler-content">
+        <div class="chain-num">Link 03</div>
+        <h4>Pattern Recognition</h4>
+        <p>Early-stage paradigm recognition. Validated conviction before mainstream consensus.</p>
+        <span class="chain-tag">Validated</span>
+      </div>
     </div>
     <div class="chain-arrow">&rarr;</div>
     <div class="chain-link">
@@ -1275,7 +1298,7 @@ section {
     <div class="chain-link">
       <div class="chain-num">Output</div>
       <h4>WayLucid Built</h4>
-      <p>30K+ LOC production CRM. 160+ features. Solo AI-augmented. 18-36x velocity multiplier demonstrated.</p>
+      <p>250K+ LOC across 21 repos. 160+ features. Solo AI-augmented. 18-36x velocity multiplier demonstrated.</p>
       <span class="chain-tag">Verified</span>
     </div>
   </div>
@@ -1346,83 +1369,44 @@ section {
   </div>
 </section>
 
-<!-- TIME COMPRESSION RATIOS -->
-<section id="production" class="reveal">
-  <div class="section-header">
-    <h3>Time Compression Ratios</h3>
-  </div>
-  <div class="tcr-grid">
-    <div class="tcr-item">
-      <h5>CRM Core</h5>
-      <div class="tcr-val">4-6x</div>
-      <div class="tcr-detail">3-4 months / 2-3 devs &rarr; ~3 weeks solo</div>
-    </div>
-    <div class="tcr-item">
-      <h5>Financial Engine</h5>
-      <div class="tcr-val">6-8x</div>
-      <div class="tcr-detail">2-3 months / 1-2 devs &rarr; ~2 weeks solo</div>
-    </div>
-    <div class="tcr-item">
-      <h5>Email Integration</h5>
-      <div class="tcr-val">6-8x</div>
-      <div class="tcr-detail">1-2 months / 1 dev &rarr; ~1 week solo</div>
-    </div>
-    <div class="tcr-item">
-      <h5>Security Hardening</h5>
-      <div class="tcr-val">6-10x</div>
-      <div class="tcr-detail">1-2 months / specialist &rarr; ~1 week solo</div>
-    </div>
-    <div class="tcr-item">
-      <h5>OCR Scanner</h5>
-      <div class="tcr-val">5-8x</div>
-      <div class="tcr-detail">2-4 weeks / 1 dev &rarr; ~3 days solo</div>
-    </div>
-    <div class="tcr-item">
-      <h5>Pitch Deck Gen</h5>
-      <div class="tcr-val">5-7x</div>
-      <div class="tcr-detail">3-4 weeks / 1 dev &rarr; ~4 days solo</div>
-    </div>
-  </div>
-</section>
-
 <!-- SKILL DOMAINS -->
-<section class="reveal">
+<section id="skills" class="reveal">
   <div class="section-header">
     <h3>Skill Domain Stack</h3>
   </div>
   <div class="skill-grid">
     <div class="skill-card">
-      <div class="skill-icon">&#x1F9E0;</div>
+      <div class="skill-icon">AI</div>
       <h4>AI-Native Development</h4>
       <p>Multi-model orchestration</p>
     </div>
     <div class="skill-card">
-      <div class="skill-icon">&#x1F4BB;</div>
+      <div class="skill-icon">FS</div>
       <h4>Full-Stack Engineering</h4>
       <p>React + TypeScript + Node</p>
     </div>
     <div class="skill-card">
-      <div class="skill-icon">&#x1F4C8;</div>
+      <div class="skill-icon">BZ</div>
       <h4>Business Strategy</h4>
       <p>Sales + market analysis</p>
     </div>
     <div class="skill-card">
-      <div class="skill-icon">&#x1F4B0;</div>
+      <div class="skill-icon">FN</div>
       <h4>Financial Analysis</h4>
       <p>Metrics + modeling</p>
     </div>
     <div class="skill-card">
-      <div class="skill-icon">&#x270D;&#xFE0F;</div>
+      <div class="skill-icon">CC</div>
       <h4>Content Creation</h4>
       <p>Research + writing</p>
     </div>
     <div class="skill-card">
-      <div class="skill-icon">&#x1F680;</div>
+      <div class="skill-icon">FE</div>
       <h4>Founder Execution</h4>
       <p>0-to-1 product builder</p>
     </div>
     <div class="skill-card">
-      <div class="skill-icon">&#x26A1;</div>
+      <div class="skill-icon">3S</div>
       <h4>3SD+ Cognitive</h4>
       <p>145+ verified capacity</p>
     </div>
@@ -1463,14 +1447,15 @@ section {
         </tr>
       </thead>
       <tbody>
-        <tr><td>Total Lines of Code</td><td>30,367+</td><td>Git repository analysis</td></tr>
-        <tr><td>Test Suite</td><td>141 tests, all passing</td><td>CI/CD pipeline logs</td></tr>
+        <tr><td>Total Lines of Code</td><td id="ev-loc">250,000+</td><td>GitHub API (live)</td></tr>
+        <tr><td>Repositories</td><td id="ev-repos">21 production repos</td><td>GitHub API (live)</td></tr>
+        <tr><td>Total Commits</td><td id="ev-commits">427+</td><td>GitHub API (live)</td></tr>
         <tr><td>Feature Count</td><td>160+ distinct features</td><td>Commit history + feature flags</td></tr>
         <tr><td>Completion Rate</td><td>98.8% (160/162)</td><td>Project tracking system</td></tr>
-        <tr><td>Architecture</td><td>React + Vite + Drizzle</td><td>Package.json + codebase</td></tr>
+        <tr><td>Stack</td><td>React 19, tRPC, Drizzle, Hono, Flask, Rust</td><td>Package.json + codebase</td></tr>
         <tr><td>Development Team</td><td>1 person (AI-augmented)</td><td>Git contributor log</td></tr>
-        <tr><td>Development Period</td><td>~6 months</td><td>First commit to current</td></tr>
-        <tr><td>Replacement Cost</td><td>$960K - $1.4M/yr</td><td>3.6 FTE equivalent analysis</td></tr>
+        <tr><td>Development Period</td><td>~18 months</td><td>First commit to current</td></tr>
+        <tr><td>Replacement Cost</td><td id="ev-value">$3.8M/yr</td><td>LOC × $15/LOC/yr industry avg</td></tr>
       </tbody>
     </table>
   </div>
@@ -1737,7 +1722,7 @@ section {
 <section class="cta-section reveal">
   <h3>Ready to see what <span style="color: var(--cyan);">escape velocity</span> looks like?</h3>
   <p>One catalytic contract restores the compound growth loop. The ROI math is simple: invest at the viability threshold, capture multiples of output value.</p>
-  <a href="mailto:brenden@waylucid.com" class="cta-btn">Initiate Contact</a>
+  <a href="https://calendly.com/bd-waylucid/1-1-waylucid" target="_blank" rel="noopener" class="cta-btn">Initiate Contact</a>
 </section>
 
 <footer class="footer">
@@ -1824,10 +1809,68 @@ function updateClock() {
 setInterval(updateClock, 1000);
 updateClock();
 
+// ===== LIVE METRICS (from metrics.json snapshot) =====
+// Regenerate with: bash dashboard/update-metrics.sh
+async function fetchLiveMetrics() {
+  try {
+    const res = await fetch('metrics.json');
+    if (!res.ok) throw new Error('metrics.json not found');
+    const data = await res.json();
+    const t = data.totals;
+
+    // Update counter targets with live values
+    const locEl = document.getElementById('loc-counter');
+    const repoEl = document.getElementById('repo-counter');
+    const commitEl = document.getElementById('commit-counter');
+    const valueEl = document.getElementById('value-counter');
+
+    if (locEl) locEl.dataset.target = t.loc;
+    if (repoEl) repoEl.dataset.target = t.repos;
+    if (commitEl) commitEl.dataset.target = t.commits;
+    if (valueEl) {
+      valueEl.dataset.target = t.equivValueM.toFixed(1);
+      valueEl.dataset.decimals = '1';
+    }
+
+    // Update evidence table
+    const evLoc = document.getElementById('ev-loc');
+    const evRepos = document.getElementById('ev-repos');
+    const evCommits = document.getElementById('ev-commits');
+    const evValue = document.getElementById('ev-value');
+    if (evLoc) evLoc.textContent = t.loc.toLocaleString() + '+';
+    if (evRepos) evRepos.textContent = t.repos + ' production repos';
+    if (evCommits) evCommits.textContent = t.commits + '+';
+    if (evValue) evValue.textContent = '$' + t.equivValueM + 'M/yr';
+
+    // Show live badge with timestamp
+    const badge = document.getElementById('live-badge');
+    if (badge) {
+      const d = new Date(data.generated);
+      const age = Math.round((Date.now() - d.getTime()) / (1000 * 60 * 60));
+      badge.innerHTML = `● LIVE &nbsp;·&nbsp; ${t.repos} repos &nbsp;·&nbsp; updated ${age < 24 ? age + 'h ago' : Math.round(age/24) + 'd ago'}`;
+      badge.style.color = 'var(--green)';
+      badge.style.opacity = '1';
+    }
+
+    console.log(`[LIVE] ${t.repos} repos, ${t.loc.toLocaleString()} LOC, ${t.commits} commits, $${t.equivValueM}M equiv`);
+  } catch (e) {
+    console.log('[METRICS] Using fallback values');
+    const badge = document.getElementById('live-badge');
+    if (badge) {
+      badge.textContent = '○ CACHED VALUES';
+      badge.style.opacity = '1';
+    }
+  }
+}
+
+// Load metrics immediately, counters animate on scroll
+fetchLiveMetrics();
+
 // ===== ANIMATED COUNTERS =====
 function animateCounters() {
   document.querySelectorAll('.counter').forEach(counter => {
-    const target = parseInt(counter.dataset.target);
+    const target = parseFloat(counter.dataset.target);
+    const decimals = parseInt(counter.dataset.decimals || '0');
     const duration = 2000;
     const start = performance.now();
 
@@ -1835,7 +1878,12 @@ function animateCounters() {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      counter.textContent = Math.floor(eased * target).toLocaleString();
+      const val = eased * target;
+      if (decimals > 0) {
+        counter.textContent = val.toFixed(decimals);
+      } else {
+        counter.textContent = Math.floor(val).toLocaleString();
+      }
       if (progress < 1) requestAnimationFrame(update);
     }
     requestAnimationFrame(update);
@@ -1941,7 +1989,7 @@ if (velCtx) {
       labels: labels,
       datasets: [
         {
-          label: 'Early Adopter (You)',
+          label: 'Early Adopter (BD)',
           data: earlyAdopter,
           borderColor: '#00f0ff',
           backgroundColor: 'rgba(0, 240, 255, 0.05)',
