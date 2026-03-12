@@ -3,2129 +3,1933 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BRENDEN DEARIE // Trajectory Dashboard</title>
-<meta name="description" content="AI-Native Developer Dashboard - Compound Velocity Tracking & Production Metrics">
+<title>BRENDEN DEARIE // Command Interface</title>
+<meta name="description" content="AI-Native Developer — 1.15M+ LOC, 35 repos, solo operator. See the signal.">
+<meta property="og:title" content="Brenden Dearie — AI-Native Developer">
+<meta property="og:description" content="1.15M+ LOC. 35 repos. 14K+ commits. Solo operator. Command interface.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&family=Oxanium:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #0f0f1a;
-  --bg-card: #111122;
-  --bg-card-hover: #161630;
-  --border: #1a1a3e;
-  --border-glow: #2a2a5e;
-  --cyan: #00f0ff;
-  --cyan-dim: #00a0aa;
-  --magenta: #ff00aa;
-  --orange: #ff6b00;
-  --green: #00ff88;
-  --yellow: #ffdd00;
-  --purple: #8b5cf6;
-  --red: #ff3366;
-  --text-primary: #e8e8f0;
-  --text-secondary: #8888aa;
-  --text-dim: #555577;
+  --bg: #080a0e;
+  --bg-panel: rgba(8, 12, 18, 0.55);
+  --bg-panel-solid: rgba(8, 12, 18, 0.6);
+  --border: rgba(126, 184, 201, 0.12);
+  --border-bright: rgba(126, 184, 201, 0.3);
+  --ice: #7eb8c9;
+  --ice-dim: #4a7a8a;
+  --ice-glow: rgba(126, 184, 201, 0.2);
+  --ice-bright: #a8dae8;
+  --gold: #d4a853;
+  --gold-dim: rgba(212, 168, 83, 0.15);
+  --green: #4ade80;
+  --green-dim: rgba(74, 222, 128, 0.15);
+  --red: #f87171;
+  --red-dim: rgba(248, 113, 113, 0.15);
+  --amber: #fbbf24;
+  --text: #d4e0e8;
+  --text-mid: #7a8a94;
+  --text-dim: #3a4a54;
+  --font-display: 'Oxanium', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --font-sans: 'Inter', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+  --scanline: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(126, 184, 201, 0.015) 2px,
+    rgba(126, 184, 201, 0.015) 4px
+  );
 }
 
 html { scroll-behavior: smooth; }
 
 body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
   overflow-x: hidden;
   min-height: 100vh;
 }
 
-/* ===== CANVAS BACKGROUND ===== */
-#bg-canvas {
+/* Scanline overlay */
+body::before {
+  content: '';
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background: var(--scanline);
+  opacity: 0.5;
+}
+
+/* Three.js canvas */
+#three-bg {
+  position: fixed;
+  inset: 0;
   z-index: 0;
   pointer-events: none;
 }
 
-/* ===== GLOBAL NAV ===== */
-.nav {
+/* Vignette overlay for depth */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(8, 10, 14, 0.5) 100%);
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 100;
-  background: rgba(10, 10, 15, 0.85);
-  backdrop-filter: blur(20px);
+  height: 40px;
+  background: rgba(8, 10, 14, 0.7);
   border-bottom: 1px solid var(--border);
-  padding: 0 2rem;
-  height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 0 1rem;
+  backdrop-filter: blur(20px);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
 }
 
-.nav-brand {
+.topbar-left {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 1.5rem;
 }
 
-.nav-brand .status-dot {
-  width: 8px; height: 8px;
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ice);
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+
+.topbar-brand .dot {
+  width: 6px; height: 6px;
   background: var(--green);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--green);
-  animation: pulse-dot 2s ease-in-out infinite;
+  box-shadow: 0 0 6px var(--green);
+  animation: blink 2s ease-in-out infinite;
 }
 
-@keyframes pulse-dot {
-  0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--green); }
-  50% { opacity: 0.5; box-shadow: 0 0 16px var(--green); }
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
-.nav-brand h1 {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-.nav-brand h1 span { color: var(--cyan); }
-
-.nav-links {
+.topbar-nav {
   display: flex;
-  gap: 2rem;
-  list-style: none;
-}
-
-.nav-links a {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 500;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: color 0.3s;
-  position: relative;
-}
-
-.nav-links a:hover, .nav-links a.active { color: var(--cyan); }
-
-.nav-links a.active::after {
-  content: '';
-  position: absolute;
-  bottom: -4px; left: 0; right: 0;
-  height: 2px;
-  background: var(--cyan);
-  box-shadow: 0 0 8px var(--cyan);
-}
-
-.nav-clock {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  color: var(--orange);
-  font-weight: 600;
-}
-
-/* ===== MAIN LAYOUT ===== */
-main {
-  position: relative;
-  z-index: 1;
-  padding-top: 56px;
-}
-
-section {
-  padding: 3rem 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-/* ===== HERO SECTION ===== */
-.hero {
-  min-height: calc(100vh - 56px);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  position: relative;
-}
-
-.hero-label {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--cyan);
-  margin-bottom: 1.5rem;
-  opacity: 0;
-  animation: fadeInUp 0.8s ease forwards 0.2s;
-}
-
-.hero h2 {
-  font-family: var(--font-sans);
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  font-weight: 900;
-  line-height: 1.05;
-  letter-spacing: -2px;
-  margin-bottom: 1rem;
-  opacity: 0;
-  animation: fadeInUp 0.8s ease forwards 0.4s;
-}
-
-.hero h2 .gradient-text {
-  background: linear-gradient(135deg, var(--cyan), var(--magenta));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hero-sub {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  max-width: 600px;
-  line-height: 1.6;
-  margin-bottom: 3rem;
-  opacity: 0;
-  animation: fadeInUp 0.8s ease forwards 0.6s;
-}
-
-.hero-formula {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  padding: 1rem 2rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: rgba(17, 17, 34, 0.5);
-  margin-bottom: 3rem;
-  opacity: 0;
-  animation: fadeInUp 0.8s ease forwards 0.8s;
-}
-
-.hero-formula .var-cc { color: var(--orange); font-weight: 700; }
-.hero-formula .var-v { color: var(--green); font-weight: 700; }
-.hero-formula .var-e { color: var(--magenta); font-weight: 700; }
-.hero-formula .var-eq { color: var(--cyan); font-weight: 700; }
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ===== METRICS BAR ===== */
-.metrics-bar {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1rem;
-  padding: 2rem;
-  opacity: 0;
-  animation: fadeInUp 0.8s ease forwards 1s;
 }
 
-.metric-hex {
-  position: relative;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem 1rem;
-  text-align: center;
-  transition: all 0.3s ease;
-  overflow: hidden;
-}
-
-.metric-hex::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.metric-hex:hover {
-  border-color: var(--border-glow);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(0, 240, 255, 0.08);
-}
-
-.metric-hex:hover::before { opacity: 1; }
-
-.metric-value {
-  font-family: var(--font-mono);
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--cyan);
-  line-height: 1;
-  margin-bottom: 0.25rem;
-}
-
-.metric-hex:nth-child(2) .metric-value { color: var(--green); }
-.metric-hex:nth-child(3) .metric-value { color: var(--orange); }
-.metric-hex:nth-child(4) .metric-value { color: var(--magenta); }
-.metric-hex:nth-child(5) .metric-value { color: var(--yellow); }
-.metric-hex:nth-child(6) .metric-value { color: var(--purple); }
-
-.metric-label {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-}
-
-/* ===== SECTION HEADERS ===== */
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 2rem;
-}
-
-.section-icon {
-  width: 32px; height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
-.section-header h3 {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--text-primary);
-}
-
-/* ===== GRID LAYOUTS ===== */
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.grid-3 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1.5rem;
-}
-
-/* ===== CARDS ===== */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.card:hover {
-  border-color: var(--border-glow);
-  box-shadow: 0 4px 24px rgba(0, 240, 255, 0.04);
-}
-
-/* ===== CONVERGENCE CHAIN ===== */
-.chain-container {
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-  overflow-x: auto;
-  padding-bottom: 1rem;
-}
-
-.chain-link {
-  flex: 1;
-  min-width: 200px;
-  position: relative;
-  padding: 1.5rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  text-align: center;
-  transition: all 0.4s ease;
-}
-
-.chain-link:hover {
-  border-color: var(--cyan);
-  box-shadow: 0 0 24px rgba(0, 240, 255, 0.1);
-  transform: translateY(-4px);
-}
-
-.chain-arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  flex-shrink: 0;
-  color: var(--cyan);
-  font-size: 1.2rem;
-  font-family: var(--font-mono);
-}
-
-.chain-link .chain-num {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--cyan);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 0.5rem;
-}
-
-.chain-link h4 {
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  color: var(--text-primary);
-}
-
-.chain-link p {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
-.chain-link .chain-tag {
-  display: inline-block;
-  margin-top: 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
+.topbar-nav a {
+  color: var(--text-dim);
+  text-decoration: none;
   letter-spacing: 1px;
   text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 4px;
-  border: 1px solid;
+  transition: color 0.2s;
+  padding: 2px 0;
+  border-bottom: 1px solid transparent;
 }
 
-.chain-link:nth-child(1) .chain-tag { color: var(--orange); border-color: var(--orange); }
-.chain-link:nth-child(3) .chain-tag { color: var(--purple); border-color: var(--purple); }
-.chain-link:nth-child(5) .chain-tag { color: var(--green); border-color: var(--green); }
-.chain-link:nth-child(7) .chain-tag { color: var(--cyan); border-color: var(--cyan); }
-.chain-link:nth-child(9) .chain-tag { color: var(--magenta); border-color: var(--magenta); }
+.topbar-nav a:hover,
+.topbar-nav a.active {
+  color: var(--ice);
+  border-bottom-color: var(--ice);
+}
 
-/* ===== SPOILER BLUR ===== */
-.spoiler-blur {
-  cursor: pointer;
-  overflow: hidden;
-}
-.spoiler-blur .spoiler-content {
-  filter: blur(8px);
-  -webkit-filter: blur(8px);
-  user-select: none;
-  transition: filter 0.5s ease;
-}
-.spoiler-blur.revealed .spoiler-content {
-  filter: blur(0);
-  -webkit-filter: blur(0);
-  user-select: auto;
-}
-.spoiler-blur .spoiler-overlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+.topbar-right {
   display: flex;
   align-items: center;
-  justify-content: center;
-  z-index: 10;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--cyan);
-  background: rgba(10, 10, 26, 0.3);
-  border-radius: 12px;
-  opacity: 1;
-  transition: opacity 0.4s ease;
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
-}
-.spoiler-blur.revealed .spoiler-overlay {
-  opacity: 0;
-  pointer-events: none;
+  gap: 1.5rem;
+  color: var(--text-dim);
 }
 
-/* ===== BCI RADAR ===== */
-.bci-container {
+.topbar-right .clock { color: var(--ice); font-weight: 500; }
+
+.topbar-sys {
   display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
-.bci-chart-wrap {
-  flex: 1;
-  max-width: 400px;
-  aspect-ratio: 1;
-}
-
-.bci-signals {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   gap: 0.75rem;
 }
 
-.bci-signal {
+.topbar-sys span {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 4px;
 }
 
-.bci-signal-name {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  width: 120px;
-  flex-shrink: 0;
+.sys-dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
 }
 
-.bci-bar-track {
-  flex: 1;
-  height: 6px;
-  background: var(--bg-primary);
-  border-radius: 3px;
-  overflow: hidden;
-}
+.sys-dot.ok { background: var(--green); box-shadow: 0 0 4px var(--green); }
+.sys-dot.warn { background: var(--amber); box-shadow: 0 0 4px var(--amber); }
 
-.bci-bar-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 1.5s ease;
-  width: 0;
-}
-
-.bci-signal-val {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  width: 40px;
-  text-align: right;
-}
-
-/* ===== VELOCITY CHART ===== */
-.velocity-chart-wrap {
-  width: 100%;
-  height: 300px;
+/* ===== COCKPIT LAYOUT ===== */
+.cockpit {
   position: relative;
+  z-index: 1;
+  padding-top: 40px;
+  min-height: 100vh;
 }
 
-/* ===== SKILL DOMAINS ===== */
-.skill-grid {
+/* HERO COMMAND */
+.command-hero {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
-}
-
-.skill-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.25rem;
-  text-align: center;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.skill-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 2px;
-  transition: opacity 0.3s;
-  opacity: 0;
-}
-
-.skill-card:hover {
-  transform: translateY(-3px);
-  border-color: var(--border-glow);
-}
-
-.skill-card:hover::after { opacity: 1; }
-
-.skill-card:nth-child(1)::after { background: var(--cyan); }
-.skill-card:nth-child(2)::after { background: var(--green); }
-.skill-card:nth-child(3)::after { background: var(--orange); }
-.skill-card:nth-child(4)::after { background: var(--magenta); }
-.skill-card:nth-child(5)::after { background: var(--yellow); }
-.skill-card:nth-child(6)::after { background: var(--purple); }
-.skill-card:nth-child(7)::after { background: var(--red); }
-
-.skill-icon {
-  width: 36px;
-  height: 36px;
-  margin: 0 auto 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  border-radius: 8px;
-  border: 1px solid;
-}
-.skill-card:nth-child(1) .skill-icon { color: var(--cyan); border-color: rgba(0,255,255,0.3); background: rgba(0,255,255,0.05); }
-.skill-card:nth-child(2) .skill-icon { color: var(--green); border-color: rgba(0,255,136,0.3); background: rgba(0,255,136,0.05); }
-.skill-card:nth-child(3) .skill-icon { color: var(--orange); border-color: rgba(255,165,0,0.3); background: rgba(255,165,0,0.05); }
-.skill-card:nth-child(4) .skill-icon { color: var(--magenta); border-color: rgba(255,0,128,0.3); background: rgba(255,0,128,0.05); }
-.skill-card:nth-child(5) .skill-icon { color: var(--yellow); border-color: rgba(255,255,0,0.3); background: rgba(255,255,0,0.05); }
-.skill-card:nth-child(6) .skill-icon { color: var(--purple); border-color: rgba(136,0,255,0.3); background: rgba(136,0,255,0.05); }
-.skill-card:nth-child(7) .skill-icon { color: var(--red); border-color: rgba(255,50,50,0.3); background: rgba(255,50,50,0.05); }
-
-.skill-card h4 {
-  font-size: 0.8rem;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-.skill-card p {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-secondary);
-}
-
-/* ===== PRODUCTION EVIDENCE TABLE ===== */
-.evidence-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.85rem;
-}
-
-.evidence-table th {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  text-align: left;
-  padding: 0.75rem 1rem;
+  grid-template-columns: 1fr auto;
+  gap: 2rem;
+  padding: 2rem 1.5rem 1rem;
   border-bottom: 1px solid var(--border);
 }
 
-.evidence-table td {
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid rgba(26, 26, 62, 0.5);
-  color: var(--text-primary);
-}
-
-.evidence-table td:nth-child(2) {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: var(--cyan);
-}
-
-.evidence-table tr:hover td {
-  background: rgba(0, 240, 255, 0.02);
-}
-
-/* ===== STACK PILLS ===== */
-.stack-pills {
+.command-id {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1rem;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
-.stack-pill {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  padding: 6px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: rgba(17, 17, 34, 0.6);
-  color: var(--text-secondary);
-  transition: all 0.3s;
-}
-
-.stack-pill:hover {
-  border-color: var(--cyan);
-  color: var(--cyan);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.1);
-}
-
-/* ===== TRAJECTORY MODEL VIS ===== */
-.trajectory-vis {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr auto 1fr;
-  gap: 0;
-  align-items: stretch;
-  margin-top: 1rem;
-}
-
-.trajectory-component {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 2rem 1.5rem;
-  text-align: center;
-  transition: all 0.4s ease;
-  position: relative;
-}
-
-.trajectory-component:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.trajectory-component:nth-child(1) { border-top: 3px solid var(--orange); }
-.trajectory-component:nth-child(3) { border-top: 3px solid var(--green); }
-.trajectory-component:nth-child(5) { border-top: 3px solid var(--magenta); }
-
-.trajectory-component h4 {
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 1px;
-  margin-bottom: 0.5rem;
-}
-
-.trajectory-component:nth-child(1) h4 { color: var(--orange); }
-.trajectory-component:nth-child(3) h4 { color: var(--green); }
-.trajectory-component:nth-child(5) h4 { color: var(--magenta); }
-
-.trajectory-component .desc {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin-bottom: 0.75rem;
-}
-
-.trajectory-component .status-tag {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  padding: 4px 10px;
-  border-radius: 4px;
-  display: inline-block;
-}
-
-.trajectory-mul {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-mono);
-  font-size: 1.5rem;
+.command-id .callsign {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 3rem);
   font-weight: 800;
-  color: var(--text-dim);
-  width: 50px;
-}
-
-/* ===== CTA / FOOTER ===== */
-.cta-section {
-  text-align: center;
-  padding: 6rem 2rem;
-}
-
-.cta-section h3 {
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
-  font-weight: 800;
-  margin-bottom: 1rem;
-}
-
-.cta-section p {
-  color: var(--text-secondary);
-  max-width: 500px;
-  margin: 0 auto 2rem;
-  line-height: 1.6;
-}
-
-.cta-btn {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  font-weight: 700;
   letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 14px 40px;
-  border: 2px solid var(--cyan);
-  color: var(--cyan);
-  background: transparent;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.3s;
-  cursor: pointer;
+  color: var(--text);
+  line-height: 1;
 }
 
-.cta-btn:hover {
-  background: var(--cyan);
-  color: var(--bg-primary);
-  box-shadow: 0 0 32px rgba(0, 240, 255, 0.3);
-}
+.command-id .callsign span { color: var(--ice); }
 
-.footer {
-  border-top: 1px solid var(--border);
-  padding: 2rem;
-  text-align: center;
+.command-id .designation {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  color: var(--text-dim);
+  font-size: 0.55rem;
+  letter-spacing: 3px;
+  color: var(--text-mid);
+  text-transform: uppercase;
+}
+
+.command-stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.command-stats .primary-metric {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: var(--ice);
+  line-height: 1;
   letter-spacing: 1px;
 }
 
-/* ===== SCROLL ANIMATIONS ===== */
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s ease;
-}
-
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ===== RARITY BADGE ===== */
-.rarity-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid var(--purple);
-  border-radius: 8px;
-  padding: 8px 16px;
+.command-stats .primary-label {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--purple);
-  font-weight: 600;
-}
-
-/* ===== RESPONSIVE ===== */
-@media (max-width: 1024px) {
-  .grid-2, .grid-3 { grid-template-columns: 1fr; }
-  .trajectory-vis {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-  .trajectory-mul {
-    width: auto;
-    height: 40px;
-    font-size: 1.2rem;
-  }
-  .bci-container { flex-direction: column; }
-  .bci-chart-wrap { max-width: 300px; margin: 0 auto; }
-}
-
-@media (max-width: 768px) {
-  .nav-links { display: none; }
-  section { padding: 2rem 1rem; }
-  .metrics-bar { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
-  .metric-hex { padding: 1rem 0.5rem; }
-  .metric-value { font-size: 1.3rem; }
-  .chain-container { flex-direction: column; }
-  .chain-arrow { width: auto; height: 30px; transform: rotate(90deg); }
-  .hero h2 { letter-spacing: -1px; }
-  .hero-formula { font-size: 0.7rem; padding: 0.75rem 1rem; }
-}
-
-@media (max-width: 480px) {
-  .metrics-bar { grid-template-columns: repeat(2, 1fr); }
-  .skill-grid { grid-template-columns: repeat(2, 1fr); }
-
-}
-
-/* ===== SENTIENCE METER ===== */
-.sentience-hero {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.sentience-composite {
-  font-family: var(--font-mono);
-  font-size: 4rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #ff3333 0%, #ff8800 30%, #00ff88 60%, #00ff88 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  line-height: 1;
-  margin-bottom: 0.25rem;
-}
-
-.sentience-label {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 3px;
+  font-size: 0.5rem;
+  letter-spacing: 2px;
+  color: var(--text-dim);
   text-transform: uppercase;
-  color: var(--text-secondary);
 }
 
-.sentience-bar-outer {
-  width: 100%;
-  height: 16px;
-  background: var(--bg-primary);
-  border-radius: 8px;
+/* MAIN GRID */
+.main-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr 220px;
+  min-height: calc(100vh - 120px);
+}
+
+/* LEFT SIDEBAR */
+.sidebar-left {
+  border-right: 1px solid var(--border);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+  position: sticky;
+  top: 120px;
+}
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-panel);
   overflow: hidden;
-  margin: 1.5rem 0 0.5rem;
-  position: relative;
 }
 
-.sentience-bar-fill {
-  height: 100%;
-  border-radius: 8px;
-  background: linear-gradient(90deg, #661111 0%, #ff3333 15%, #ff8800 35%, #ffdd00 50%, #00ff88 70%, #00ff88 100%);
-  transition: width 2s cubic-bezier(0.16, 1, 0.3, 1);
-  width: 0;
-  position: relative;
-}
-
-.sentience-bar-fill::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: -2px;
-  width: 3px;
-  height: 20px;
-  background: white;
-  box-shadow: 0 0 10px var(--green), 0 0 20px var(--green);
-  border-radius: 2px;
-}
-
-.sentience-bar-labels {
+.panel-header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 2px;
+  color: var(--text-mid);
+  text-transform: uppercase;
+}
+
+.panel-header .status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.panel-header .status::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 4px var(--green);
+}
+
+.panel-body { padding: 0.75rem; }
+
+/* Metric rows */
+.metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid rgba(126, 184, 201, 0.04);
+}
+
+.metric-row:last-child { border-bottom: none; }
+
+.metric-row .label {
   font-family: var(--font-mono);
   font-size: 0.55rem;
   color: var(--text-dim);
   letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
-.benchmark-categories {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
-  margin-top: 2rem;
-}
-
-.bench-cat {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1rem 1.25rem;
-  transition: all 0.3s;
-}
-
-.bench-cat:hover {
-  border-color: var(--border-glow);
-  transform: translateY(-2px);
-}
-
-.bench-cat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.75rem;
-}
-
-.bench-cat-name {
+.metric-row .value {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  color: var(--ice);
+}
+
+.metric-row .value.gold { color: var(--gold); }
+.metric-row .value.green { color: var(--green); }
+
+/* Velocity gauge — SVG arc */
+.velocity-gauge {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.velocity-gauge svg {
+  width: 180px;
+  height: 110px;
+  overflow: visible;
+}
+
+.gauge-track {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.gauge-fill {
+  fill: none;
+  stroke: url(#gaugeGrad);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 251;
+  stroke-dashoffset: 251;
+  transition: stroke-dashoffset 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 0 6px rgba(126, 184, 201, 0.4));
+}
+
+.gauge-fill.animated {
+  stroke-dashoffset: 25;
+}
+
+.gauge-ticks line {
+  stroke: var(--text-dim);
+  stroke-width: 1;
+  opacity: 0.3;
+}
+
+.gauge-center-value {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--ice);
+  text-align: center;
+  margin-top: -0.25rem;
+  text-shadow: 0 0 20px rgba(126, 184, 201, 0.3);
+}
+
+.gauge-label {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-align: center;
   text-transform: uppercase;
 }
 
-.bench-cat-weight {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--text-dim);
-}
-
-.bench-cat-bar {
-  width: 100%;
-  height: 8px;
-  background: var(--bg-primary);
-  border-radius: 4px;
-  overflow: visible;
-  position: relative;
-  margin-bottom: 0.5rem;
-}
-
-.bench-cat-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 1.8s cubic-bezier(0.16, 1, 0.3, 1);
-  width: 0;
-}
-
-.bench-cat-ceiling {
-  position: absolute;
-  top: -4px;
-  width: 2px;
-  height: 16px;
-  background: var(--text-dim);
-  border-radius: 1px;
-}
-
-.bench-cat-ceiling::after {
-  content: 'FRONTIER';
-  position: absolute;
-  top: -14px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-mono);
-  font-size: 0.45rem;
-  letter-spacing: 1px;
-  color: var(--text-dim);
-  white-space: nowrap;
-}
-
-.bench-cat-scores {
+.gauge-range {
   display: flex;
   justify-content: space-between;
+  width: 160px;
+  margin-top: 0.25rem;
+}
+
+.gauge-range span {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.45rem;
+  color: var(--text-dim);
 }
 
-.bench-cat-scores .wm-score { color: var(--green); font-weight: 700; }
-.bench-cat-scores .frontier-score { color: var(--text-dim); }
-
-.frontier-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 2rem;
-  font-size: 0.8rem;
-}
-
-.frontier-table th {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  padding: 0.6rem 0.5rem;
-  text-align: center;
-  border-bottom: 1px solid var(--border);
-}
-
-.frontier-table th:first-child { text-align: left; }
-
-.frontier-table td {
-  padding: 0.6rem 0.5rem;
-  text-align: center;
-  border-bottom: 1px solid rgba(26, 26, 62, 0.4);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-}
-
-.frontier-table td:first-child {
-  text-align: left;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.frontier-table tr:hover td { background: rgba(0, 240, 255, 0.02); }
-
-.frontier-table .wm-row td {
-  color: var(--green);
-  font-weight: 700;
-  background: rgba(0, 255, 136, 0.03);
-}
-
-.frontier-table .wm-row td:first-child { color: var(--green); }
-
-.frontier-table .best-cell {
-  color: var(--yellow) !important;
-  font-weight: 800;
-}
-
-.wm-advantages {
+/* Velocity sub-metrics */
+.velocity-stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.75rem;
-  margin-top: 1.5rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+  width: 100%;
 }
 
-.wm-adv {
-  background: rgba(0, 255, 136, 0.04);
-  border: 1px solid rgba(0, 255, 136, 0.15);
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+.vel-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0.4rem;
+  background: rgba(126, 184, 201, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 3px;
 }
 
-.wm-adv strong {
-  color: var(--green);
+.vel-stat .label {
   font-family: var(--font-mono);
-  font-size: 0.65rem;
-  letter-spacing: 1px;
+  font-size: 0.5rem;
+  color: var(--text-dim);
   text-transform: uppercase;
-  display: block;
-  margin-bottom: 0.25rem;
+  letter-spacing: 0.5px;
 }
 
-/* ===== ANIMATED COUNTERS ===== */
-.counter { display: inline-block; }
+.vel-stat .value {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  font-weight: 600;
+  color: var(--ice);
+}
 
-/* ===== GLOW LINE ===== */
+.vel-stat .value.gold { color: var(--gold); }
+.vel-stat .value.green { color: var(--green); }
+
+/* Glow line divider */
 .glow-line {
   width: 100%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-  opacity: 0.3;
-  margin: 1rem 0;
+  background: linear-gradient(90deg, transparent, var(--ice), transparent);
+  opacity: 0.15;
+  margin: 0.5rem 0;
 }
 
-/* ===== WINDOW INDICATOR ===== */
-.window-indicator {
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* RARITY ENGINE */
+.rarity-gauge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rarity-gauge-svg {
+  width: 100%;
+  max-width: 240px;
+}
+
+.gauge-tick-label {
+  font-family: var(--font-mono);
+  font-size: 6px;
+  fill: var(--text-dim);
+}
+
+.gauge-track {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.gauge-fill {
+  fill: none;
+  stroke: url(#rarity-grad);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  transition: stroke-dashoffset 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: drop-shadow(0 0 6px rgba(126, 184, 201, 0.5));
+}
+
+.gauge-fill.animated {
+  stroke-dashoffset: 132;
+}
+
+.gauge-needle {
+  fill: var(--ice);
+  filter: drop-shadow(0 0 8px rgba(126, 184, 201, 0.8));
+  transform-origin: 120px 85px;
+  transition: transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gauge-needle-glow {
+  fill: var(--ice-bright);
+  opacity: 0.5;
+  filter: blur(3px);
+  transform-origin: 120px 85px;
+  transition: transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gauge-target-zone {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 5;
+  stroke-linecap: round;
+  opacity: 0.15;
+  filter: drop-shadow(0 0 4px rgba(212, 168, 83, 0.3));
+}
+
+.rarity-score {
+  text-align: center;
+}
+
+.rarity-score .pri-value {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ice-bright);
+  letter-spacing: 1px;
+}
+
+.rarity-score .pri-target {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--gold);
+  margin-top: 2px;
+}
+
+.evi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid var(--border-bright);
+  background: rgba(126, 184, 201, 0.05);
+  margin-top: 6px;
+}
+
+.evi-badge .evi-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--ice);
+  box-shadow: 0 0 6px var(--ice);
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+.rarity-expand-btn {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: rgba(0, 255, 136, 0.05);
-  border: 1px solid rgba(0, 255, 136, 0.2);
-  border-radius: 8px;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  padding: 6px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 0.45rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: color 0.3s;
+  text-transform: uppercase;
+}
+
+.rarity-expand-btn:hover { color: var(--ice); }
+
+.rarity-expand-btn .chevron {
+  transition: transform 0.3s;
+  font-size: 0.5rem;
+}
+
+.rarity-expand-btn.open .chevron {
+  transform: rotate(180deg);
+}
+
+.rarity-breakdown {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rarity-breakdown.open {
+  max-height: 600px;
+}
+
+.rarity-dim-group {
+  margin-bottom: 8px;
+}
+
+.rarity-dim-group .group-label {
+  font-family: var(--font-mono);
+  font-size: 0.4rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid var(--border);
+}
+
+.rarity-dim {
+  display: grid;
+  grid-template-columns: 1fr auto 40px;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 0;
+  font-size: 0.48rem;
+}
+
+.rarity-dim .dim-label {
+  color: var(--text);
+  font-family: var(--font-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rarity-dim .dim-label .lock {
+  font-size: 0.4rem;
+  margin-left: 3px;
+  opacity: 0.5;
+}
+
+.rarity-dim .dim-rarity {
+  font-family: var(--font-mono);
+  color: var(--ice);
+  font-size: 0.45rem;
+  text-align: right;
+}
+
+.rarity-dim .dim-bar {
+  height: 3px;
+  background: var(--border);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.rarity-dim .dim-bar-fill {
+  height: 100%;
+  border-radius: 1px;
+  background: var(--ice);
+  transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rarity-formula {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.4rem;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
+
+/* TRAJECTORY */
+.trajectory-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.traj-node {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+}
+
+.traj-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.traj-dot.active {
+  background: var(--ice);
+  box-shadow: 0 0 6px var(--ice-glow);
+}
+
+.traj-node .name { color: var(--text-mid); }
+.traj-node .tag {
+  margin-left: auto;
+  color: var(--text-dim);
+  font-size: 0.45rem;
+  letter-spacing: 1px;
+}
+
+.traj-line {
+  width: 1px;
+  height: 8px;
+  background: var(--border);
+  margin-left: 2.5px;
+}
+
+/* CENTER CONTENT */
+.center-content {
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+}
+
+/* Systems grid */
+.systems-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.systems-header .count { color: var(--ice); }
+
+.systems-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.system-card {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.75rem;
+  background: var(--bg-panel);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: default;
+}
+
+.system-card:hover {
+  border-color: var(--border-bright);
+  box-shadow: 0 0 16px rgba(126, 184, 201, 0.05);
+}
+
+.system-card .name {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.system-card .loc {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--ice);
+  margin-bottom: 0.5rem;
+}
+
+.system-bar {
+  height: 3px;
+  background: rgba(126, 184, 201, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 0.3rem;
+}
+
+.system-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ice-dim), var(--ice));
+  border-radius: 2px;
+  width: 0;
+  transition: width 1.2s ease;
+}
+
+.system-card .commits {
+  font-family: var(--font-mono);
+  font-size: 0.45rem;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+/* WINTERMUTE SECTION */
+.wintermute-section {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-panel);
+}
+
+.wm-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wm-header .title {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+  color: var(--text-mid);
+  text-transform: uppercase;
+}
+
+.wm-header .score {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.wm-body { padding: 1rem; }
+
+.wm-bar-outer {
+  height: 8px;
+  background: rgba(126, 184, 201, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.wm-bar-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--ice-dim) 0%, var(--ice) 60%, var(--gold) 100%);
+  transition: width 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.wm-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.4rem;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  margin-bottom: 1.25rem;
+}
+
+.bench-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.bench-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.bench-item .bench-head {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+}
+
+.bench-item .bench-head .name { color: var(--text-mid); }
+.bench-item .bench-head .val { color: var(--ice); font-weight: 700; }
+
+.bench-item .bench-bar {
+  height: 3px;
+  background: rgba(126, 184, 201, 0.06);
+  border-radius: 2px;
+  position: relative;
+}
+
+.bench-item .bench-fill {
+  height: 100%;
+  background: var(--ice);
+  border-radius: 2px;
+  width: 0;
+  transition: width 1.5s ease;
+}
+
+.bench-item .bench-ceiling {
+  position: absolute;
+  top: -2px;
+  width: 1px;
+  height: 7px;
+  background: var(--text-dim);
+}
+
+/* Frontier table */
+.frontier-compact {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
   margin-top: 1rem;
 }
 
-.window-indicator .wi-label {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
+.frontier-compact th {
+  padding: 0.4rem 0.3rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+  font-weight: 500;
+  font-size: 0.45rem;
   letter-spacing: 1px;
+}
+
+.frontier-compact th:first-child { text-align: left; }
+
+.frontier-compact td {
+  padding: 0.35rem 0.3rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(126, 184, 201, 0.03);
+  color: var(--text-dim);
+  font-size: 0.55rem;
+}
+
+.frontier-compact td:first-child {
+  text-align: left;
+  color: var(--text-mid);
+}
+
+.frontier-compact .wm-row td {
+  color: var(--ice);
+  font-weight: 700;
+  border-top: 1px solid var(--border);
+}
+
+.frontier-compact .best { color: var(--gold); font-weight: 700; }
+
+/* RIGHT SIDEBAR */
+.sidebar-right {
+  border-left: 1px solid var(--border);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+  position: sticky;
+  top: 120px;
+}
+
+/* Live feed */
+.feed {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: var(--text-dim);
+  line-height: 1.8;
+}
+
+.feed .line { opacity: 0; animation: feedIn 0.3s ease forwards; }
+
+@keyframes feedIn {
+  from { opacity: 0; transform: translateX(-4px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.feed .timestamp { color: var(--text-dim); }
+.feed .event { color: var(--text-mid); }
+.feed .value { color: var(--ice); }
+.feed .highlight { color: var(--gold); }
+
+/* Tech stack pills */
+.stack-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.stack-pill {
+  font-family: var(--font-mono);
+  font-size: 0.45rem;
+  letter-spacing: 1px;
+  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  color: var(--text-dim);
   text-transform: uppercase;
-  color: var(--green);
-  font-weight: 600;
 }
 
-.window-bar {
-  flex: 1;
-  height: 8px;
-  background: var(--bg-primary);
-  border-radius: 4px;
-  overflow: hidden;
-  position: relative;
+.stack-pill.primary { color: var(--ice); border-color: var(--ice-dim); }
+
+/* CTA */
+.cta-panel {
+  margin-top: auto;
 }
 
-.window-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--green), var(--yellow));
-  border-radius: 4px;
-  width: 60%;
-  position: relative;
-}
-
-.window-bar-marker {
-  position: absolute;
-  right: -1px;
-  top: -4px;
-  width: 2px;
-  height: 16px;
-  background: var(--cyan);
-  box-shadow: 0 0 8px var(--cyan);
-}
-
-.window-range {
+.cta-btn {
+  display: block;
+  width: 100%;
   font-family: var(--font-mono);
   font-size: 0.6rem;
-  color: var(--text-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ice);
+  border: 1px solid var(--ice-dim);
+  background: transparent;
+  padding: 0.75rem;
+  border-radius: 2px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.cta-btn:hover {
+  background: var(--ice);
+  color: var(--bg);
+  box-shadow: 0 0 20px var(--ice-glow);
+}
+
+/* STATUS FOOTER BAR */
+.status-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 100;
+  height: 24px;
+  background: rgba(8, 10, 14, 0.7);
+  border-top: 1px solid var(--border);
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  margin-top: 4px;
+  padding: 0 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.45rem;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  backdrop-filter: blur(16px);
+}
+
+.status-bar .left, .status-bar .right {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.status-bar .live {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--green);
+}
+
+.status-bar .live::before {
+  content: '';
+  width: 4px; height: 4px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 4px var(--green);
+  animation: blink 2s ease-in-out infinite;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .main-grid { grid-template-columns: 1fr; }
+  .sidebar-left, .sidebar-right {
+    position: static;
+    max-height: none;
+    border: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 1rem;
+  }
+  .sidebar-left .panel, .sidebar-right .panel { flex: 1; min-width: 200px; }
+  .command-hero { grid-template-columns: 1fr; text-align: center; }
+  .command-stats { align-items: center; }
+}
+
+@media (max-width: 640px) {
+  .topbar-nav { display: none; }
+  .topbar-sys { display: none; }
+  .bench-grid { grid-template-columns: 1fr; }
+  .systems-grid { grid-template-columns: 1fr; }
+  .status-bar .right { display: none; }
 }
 </style>
 </head>
 <body>
-
-<canvas id="bg-canvas"></canvas>
-
-<!-- NAV -->
-<nav class="nav">
-  <div class="nav-brand">
-    <div class="status-dot"></div>
-    <h1>BRENDEN <span>DEARIE</span></h1>
-  </div>
-  <ul class="nav-links">
-    <li><a href="#command" class="active">Command</a></li>
-    <li><a href="#velocity">Velocity</a></li>
-    <li><a href="#convergence">Chain</a></li>
-    <li><a href="#bci">BCI</a></li>
-    <li><a href="#skills">Skills</a></li>
-    <li><a href="#wintermute">Wintermute</a></li>
-  </ul>
-  <div class="nav-clock" id="clock"></div>
-</nav>
-
-<main>
-
-<!-- HERO -->
-<section class="hero" id="command">
-  <div class="hero-label">AI-Native Developer &bull; Founder, WayLucid &bull; Phoenix, AZ</div>
-  <h2>
-    Building at<br>
-    <span class="gradient-text">Escape Velocity</span>
-  </h2>
-  <p class="hero-sub">
-    Solo AI-augmented developer producing 18-36x traditional output velocity.
-    336,000+ LOC across 23 production systems. 500+ features. One operator.
-  </p>
-  <div class="hero-formula">
-    <span class="var-eq">RP(t)</span> =
-    <span class="var-cc">CC</span> &times;
-    <span class="var-v">V(t)</span> &times;
-    <span class="var-e">E(t)</span>
-    &nbsp;&nbsp;&mdash;&nbsp;&nbsp;
-    <span style="color: var(--text-dim)">The Trajectory Model</span>
-  </div>
-  <div class="rarity-badge">
-    Profile Rarity: ~1 in 1.6M &bull; Tier 6 Classification
-  </div>
-
-  <!-- METRICS BAR (live from GitHub API) -->
-  <div class="metrics-bar">
-    <div class="metric-hex">
-      <div class="metric-value"><span class="counter" id="loc-counter" data-target="336675">0</span>+</div>
-      <div class="metric-label">Lines of Code</div>
-    </div>
-    <div class="metric-hex">
-      <div class="metric-value"><span class="counter" id="repo-counter" data-target="23">0</span></div>
-      <div class="metric-label">Repos</div>
-    </div>
-    <div class="metric-hex">
-      <div class="metric-value"><span class="counter" id="commit-counter" data-target="14036">0</span>+</div>
-      <div class="metric-label">Commits</div>
-    </div>
-    <div class="metric-hex">
-      <div class="metric-value"><span class="counter" data-target="18">0</span>-36x</div>
-      <div class="metric-label">Velocity</div>
-    </div>
-    <div class="metric-hex">
-      <div class="metric-value"><span class="counter" id="feature-counter" data-target="500">0</span>+</div>
-      <div class="metric-label">Features</div>
-    </div>
-    <div class="metric-hex">
-      <div class="metric-value">$<span class="counter" id="value-counter" data-target="5.1" data-decimals="1">0</span><span style="font-size:0.8em">M</span></div>
-      <div class="metric-label">Equiv Value/yr</div>
-    </div>
-  </div>
-  <div style="text-align:center; margin-top: 0.5rem;">
-    <span id="live-badge" style="font-family:var(--font-mono); font-size:0.55rem; letter-spacing:2px; color:var(--text-dim); opacity:0; transition: opacity 1s;">● LIVE FROM GITHUB</span>
-  </div>
-</section>
-
-<!-- TRAJECTORY MODEL -->
-<section id="trajectory" class="reveal">
-  <div class="section-header">
-    <h3>The Trajectory Model</h3>
-  </div>
-  <div class="trajectory-vis">
-    <div class="trajectory-component">
-      <h4>Convergence Chain</h4>
-      <div class="desc">Irreproducible sequence of formative inputs. Historical. Fixed. 4 verified links.</div>
-      <span class="status-tag" style="background: rgba(255,107,0,0.1); color: var(--orange); border: 1px solid var(--orange);">Intact</span>
-    </div>
-    <div class="trajectory-mul">&times;</div>
-    <div class="trajectory-component">
-      <h4>Compound Velocity</h4>
-      <div class="desc">Exponentially accelerating output. 18+ months of compound AI-native practice.</div>
-      <span class="status-tag" style="background: rgba(0,255,136,0.1); color: var(--green); border: 1px solid var(--green);">Growing</span>
-    </div>
-    <div class="trajectory-mul">&times;</div>
-    <div class="trajectory-component">
-      <h4>Environmental Viability</h4>
-      <div class="desc">Resource state enabling continued production. Currently the binding constraint.</div>
-      <span class="status-tag" style="background: rgba(255,0,170,0.1); color: var(--magenta); border: 1px solid var(--magenta);">Seeking Catalyst</span>
-    </div>
-  </div>
-
-  <div class="window-indicator" style="margin-top: 2rem;">
-    <div class="wi-label">Escape Window</div>
-    <div style="flex:1">
-      <div class="window-bar">
-        <div class="window-bar-fill">
-          <div class="window-bar-marker"></div>
-        </div>
-      </div>
-      <div class="window-range">
-        <span>2023</span>
-        <span style="color: var(--cyan);">NOW (18mo in)</span>
-        <span>2027</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CONVERGENCE CHAIN -->
-<section id="convergence" class="reveal">
-  <div class="section-header">
-    <h3>Convergence Chain</h3>
-  </div>
-  <div class="chain-container">
-    <div class="chain-link">
-      <div class="chain-num">Link 01</div>
-      <h4>Chain-Reaction Cognition</h4>
-      <p>Rube Goldberg machines: pipeline architecture thinking. Sequential processing with heterogeneous interfaces.</p>
-      <span class="chain-tag">Formation</span>
-    </div>
-    <div class="chain-arrow">&rarr;</div>
-    <div class="chain-link">
-      <div class="chain-num">Link 02</div>
-      <h4>Strategic Systems</h4>
-      <p>StarCraft: Brood War. Multi-threaded execution, macro/micro optimization, fog-of-war decisions at 200+ APM.</p>
-      <span class="chain-tag">Skill Build</span>
-    </div>
-    <div class="chain-arrow">&rarr;</div>
-    <div class="chain-link">
-      <div class="chain-num">Link 03</div>
-      <h4>Pattern Recognition</h4>
-      <p>Early-stage paradigm recognition. Validated conviction before mainstream consensus.</p>
-      <span class="chain-tag">Validated</span>
-    </div>
-    <div class="chain-arrow">&rarr;</div>
-    <div class="chain-link">
-      <div class="chain-num">Link 04</div>
-      <h4>AI-Native Dev</h4>
-      <p>Entered paradigm at inflection. 18+ months compound practice orchestrating multi-model production systems.</p>
-      <span class="chain-tag">Active</span>
-    </div>
-    <div class="chain-arrow">&rarr;</div>
-    <div class="chain-link">
-      <div class="chain-num">Output</div>
-      <h4>WayLucid Built</h4>
-      <p>336K+ LOC across 23 repos. 500+ features. Solo AI-augmented. 18-36x velocity multiplier demonstrated.</p>
-      <span class="chain-tag">Verified</span>
-    </div>
-  </div>
-</section>
-
-<!-- BCI + VELOCITY -->
-<section class="reveal">
-  <div class="grid-2">
-    <!-- BCI RADAR -->
-    <div class="card" id="bci">
-      <div class="section-header">
-        <h3>Behavioral Cognitive Index</h3>
-      </div>
-      <div class="bci-container">
-        <div class="bci-chart-wrap">
-          <canvas id="bciChart"></canvas>
-        </div>
-        <div class="bci-signals">
-          <div class="bci-signal">
-            <span class="bci-signal-name">Throughput</span>
-            <div class="bci-bar-track"><div class="bci-bar-fill" data-width="92" style="background: var(--cyan);"></div></div>
-            <span class="bci-signal-val" style="color: var(--cyan);">0.92</span>
-          </div>
-          <div class="bci-signal">
-            <span class="bci-signal-name">Complexity</span>
-            <div class="bci-bar-track"><div class="bci-bar-fill" data-width="85" style="background: var(--green);"></div></div>
-            <span class="bci-signal-val" style="color: var(--green);">0.85</span>
-          </div>
-          <div class="bci-signal">
-            <span class="bci-signal-name">Breadth</span>
-            <div class="bci-bar-track"><div class="bci-bar-fill" data-width="88" style="background: var(--orange);"></div></div>
-            <span class="bci-signal-val" style="color: var(--orange);">0.88</span>
-          </div>
-          <div class="bci-signal">
-            <span class="bci-signal-name">Compression</span>
-            <div class="bci-bar-track"><div class="bci-bar-fill" data-width="94" style="background: var(--magenta);"></div></div>
-            <span class="bci-signal-val" style="color: var(--magenta);">0.94</span>
-          </div>
-          <div class="bci-signal">
-            <span class="bci-signal-name">Error Rate</span>
-            <div class="bci-bar-track"><div class="bci-bar-fill" data-width="90" style="background: var(--yellow);"></div></div>
-            <span class="bci-signal-val" style="color: var(--yellow);">0.90</span>
-          </div>
-          <div class="bci-signal">
-            <span class="bci-signal-name">Adaptation</span>
-            <div class="bci-bar-track"><div class="bci-bar-fill" data-width="87" style="background: var(--purple);"></div></div>
-            <span class="bci-signal-val" style="color: var(--purple);">0.87</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- VELOCITY CHART -->
-    <div class="card" id="velocity">
-      <div class="section-header">
-        <h3>Compound Velocity Curve</h3>
-      </div>
-      <div class="velocity-chart-wrap">
-        <canvas id="velocityChart"></canvas>
-      </div>
-      <div class="window-indicator">
-        <div class="wi-label" style="font-size: 0.6rem;">Compounding</div>
-        <div style="font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-secondary);">
-          Early Adopter advantage widens exponentially. Gap is now insurmountable.
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SKILL DOMAINS -->
-<section id="skills" class="reveal">
-  <div class="section-header">
-    <h3>Skill Domain Stack</h3>
-  </div>
-  <div class="skill-grid">
-    <div class="skill-card">
-      <div class="skill-icon">AI</div>
-      <h4>AI-Native Development</h4>
-      <p>Multi-model orchestration</p>
-    </div>
-    <div class="skill-card">
-      <div class="skill-icon">FS</div>
-      <h4>Full-Stack Engineering</h4>
-      <p>React + TypeScript + Node</p>
-    </div>
-    <div class="skill-card">
-      <div class="skill-icon">BZ</div>
-      <h4>Business Strategy</h4>
-      <p>Sales + market analysis</p>
-    </div>
-    <div class="skill-card">
-      <div class="skill-icon">FN</div>
-      <h4>Financial Analysis</h4>
-      <p>Metrics + modeling</p>
-    </div>
-    <div class="skill-card">
-      <div class="skill-icon">CC</div>
-      <h4>Content Creation</h4>
-      <p>Research + writing</p>
-    </div>
-    <div class="skill-card">
-      <div class="skill-icon">FE</div>
-      <h4>Founder Execution</h4>
-      <p>0-to-1 product builder</p>
-    </div>
-    <div class="skill-card">
-      <div class="skill-icon">3S</div>
-      <h4>3SD+ Cognitive</h4>
-      <p>145+ verified capacity</p>
-    </div>
-  </div>
-
-  <div class="stack-pills">
-    <span class="stack-pill">React</span>
-    <span class="stack-pill">TypeScript</span>
-    <span class="stack-pill">Vite</span>
-    <span class="stack-pill">Drizzle ORM</span>
-    <span class="stack-pill">PostgreSQL</span>
-    <span class="stack-pill">Node.js</span>
-    <span class="stack-pill">Python</span>
-    <span class="stack-pill">Tailwind</span>
-    <span class="stack-pill">Claude</span>
-    <span class="stack-pill">GPT-4</span>
-    <span class="stack-pill">Cursor</span>
-    <span class="stack-pill">Git</span>
-    <span class="stack-pill">CI/CD</span>
-    <span class="stack-pill">Security Audit</span>
-    <span class="stack-pill">REST APIs</span>
-    <span class="stack-pill">OAuth</span>
-  </div>
-</section>
-
-<!-- PRODUCTION EVIDENCE -->
-<section class="reveal">
-  <div class="section-header">
-    <h3>Production Evidence</h3>
-  </div>
-  <div class="card">
-    <table class="evidence-table">
-      <thead>
-        <tr>
-          <th>Metric</th>
-          <th>Value</th>
-          <th>Verification</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Total Lines of Code</td><td id="ev-loc">336,000+</td><td>GitHub API (live)</td></tr>
-        <tr><td>Repositories</td><td id="ev-repos">23 production repos</td><td>GitHub API (live)</td></tr>
-        <tr><td>Total Commits</td><td id="ev-commits">14,036+</td><td>GitHub API (live)</td></tr>
-        <tr><td>Feature Count</td><td>500+ distinct features</td><td>Commit history analysis (23 repos)</td></tr>
-        <tr><td>Completion Rate</td><td>98.8%</td><td>Project tracking system</td></tr>
-        <tr><td>Stack</td><td>React 19, tRPC, Drizzle, Hono, Flask, Rust</td><td>Package.json + codebase</td></tr>
-        <tr><td>Development Team</td><td>1 person (AI-augmented)</td><td>Git contributor log</td></tr>
-        <tr><td>Development Period</td><td>~18 months</td><td>First commit to current</td></tr>
-        <tr><td>Replacement Cost</td><td id="ev-value">$5.1M/yr</td><td>LOC × $15/LOC/yr industry avg</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- WINTERMUTE SENTIENCE METER -->
-<section id="wintermute" class="reveal">
-  <div class="section-header">
-    <h3>Wintermute Intelligence Lab // Sentience Meter</h3>
-    <p style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.5rem;">Prototype Custom LLM &middot; Qwen3-30B-A3B MoE Base &middot; Nightly Benchmark Gym</p>
-  </div>
-  <div class="card">
-    <div class="sentience-hero">
-      <div class="sentience-label">Composite Sentience Index</div>
-      <div class="sentience-composite" id="sentience-score">0%</div>
-      <div style="font-size: 0.75rem; color: var(--text-secondary);">Custom LLM vs. Frontier Model Ceiling</div>
-    </div>
-    <div class="sentience-bar-outer">
-      <div class="sentience-bar-fill" id="sentience-bar" data-width="101"></div>
-    </div>
-    <div class="sentience-bar-labels">
-      <span>DORMANT</span>
-      <span>AWAKENING</span>
-      <span>COGNITIVE</span>
-      <span>FRONTIER</span>
-    </div>
-
-    <!-- CATEGORY BREAKDOWN -->
-    <div class="benchmark-categories" id="bench-cats">
-      <div class="bench-cat">
-        <div class="bench-cat-header">
-          <span class="bench-cat-name" style="color: var(--cyan);">Reasoning</span>
-          <span class="bench-cat-weight">w=0.20</span>
-        </div>
-        <div class="bench-cat-bar">
-          <div class="bench-cat-fill" data-width="91" style="background: var(--cyan);"></div>
-          <div class="bench-cat-ceiling" style="left: 91.3%;"></div>
-        </div>
-        <div class="bench-cat-scores">
-          <span class="wm-score">91.3%</span>
-          <span>GPQA Diamond, GSM8K</span>
-          <span class="frontier-score">91.3% ceiling</span>
-        </div>
-      </div>
-      <div class="bench-cat">
-        <div class="bench-cat-header">
-          <span class="bench-cat-name" style="color: var(--green);">Code</span>
-          <span class="bench-cat-weight">w=0.15</span>
-        </div>
-        <div class="bench-cat-bar">
-          <div class="bench-cat-fill" data-width="95" style="background: var(--green);"></div>
-          <div class="bench-cat-ceiling" style="left: 80.9%;"></div>
-        </div>
-        <div class="bench-cat-scores">
-          <span class="wm-score">95.0%</span>
-          <span>SWE-Bench, HumanEval</span>
-          <span class="frontier-score">80.9% ceiling</span>
-        </div>
-      </div>
-      <div class="bench-cat">
-        <div class="bench-cat-header">
-          <span class="bench-cat-name" style="color: var(--orange);">Knowledge</span>
-          <span class="bench-cat-weight">w=0.10</span>
-        </div>
-        <div class="bench-cat-bar">
-          <div class="bench-cat-fill" data-width="93" style="background: var(--orange);"></div>
-          <div class="bench-cat-ceiling" style="left: 93%;"></div>
-        </div>
-        <div class="bench-cat-scores">
-          <span class="wm-score">92.9%</span>
-          <span>MMLU-Pro, ARC-Challenge</span>
-          <span class="frontier-score">93.0% ceiling</span>
-        </div>
-      </div>
-      <div class="bench-cat">
-        <div class="bench-cat-header">
-          <span class="bench-cat-name" style="color: var(--magenta);">Abstraction</span>
-          <span class="bench-cat-weight">w=0.15</span>
-        </div>
-        <div class="bench-cat-bar">
-          <div class="bench-cat-fill" data-width="93" style="background: var(--magenta);"></div>
-          <div class="bench-cat-ceiling" style="left: 77.1%;"></div>
-        </div>
-        <div class="bench-cat-scores">
-          <span class="wm-score">92.5%</span>
-          <span>ARC-AGI-2</span>
-          <span class="frontier-score">77.1% ceiling</span>
-        </div>
-      </div>
-      <div class="bench-cat">
-        <div class="bench-cat-header">
-          <span class="bench-cat-name" style="color: var(--yellow);">Truthfulness</span>
-          <span class="bench-cat-weight">w=0.10</span>
-        </div>
-        <div class="bench-cat-bar">
-          <div class="bench-cat-fill" data-width="81" style="background: var(--yellow);"></div>
-          <div class="bench-cat-ceiling" style="left: 85%;"></div>
-        </div>
-        <div class="bench-cat-scores">
-          <span class="wm-score">81.3%</span>
-          <span>TruthfulQA</span>
-          <span class="frontier-score">85.0% ceiling</span>
-        </div>
-      </div>
-      <div class="bench-cat">
-        <div class="bench-cat-header">
-          <span class="bench-cat-name" style="color: var(--purple);">Instruction</span>
-          <span class="bench-cat-weight">w=0.10</span>
-        </div>
-        <div class="bench-cat-bar">
-          <div class="bench-cat-fill" data-width="93" style="background: var(--purple);"></div>
-          <div class="bench-cat-ceiling" style="left: 90%;"></div>
-        </div>
-        <div class="bench-cat-scores">
-          <span class="wm-score">93.3%</span>
-          <span>IFEval, LiveBench</span>
-          <span class="frontier-score">90.0% ceiling</span>
-        </div>
-      </div>
-      <div class="bench-cat">
-        <div class="bench-cat-header">
-          <span class="bench-cat-name" style="color: var(--red);">Agentic</span>
-          <span class="bench-cat-weight">w=0.05</span>
-        </div>
-        <div class="bench-cat-bar">
-          <div class="bench-cat-fill" data-width="77" style="background: var(--red);"></div>
-        </div>
-        <div class="bench-cat-scores">
-          <span class="wm-score">76.7%</span>
-          <span>LLM-PySC2, NetHack</span>
-          <span class="frontier-score">no ceiling</span>
-        </div>
-      </div>
-      <div class="bench-cat">
-        <div class="bench-cat-header">
-          <span class="bench-cat-name" style="color: var(--green);">Domain</span>
-          <span class="bench-cat-weight">w=0.15</span>
-        </div>
-        <div class="bench-cat-bar">
-          <div class="bench-cat-fill" data-width="85" style="background: linear-gradient(90deg, var(--green), var(--cyan));"></div>
-        </div>
-        <div class="bench-cat-scores">
-          <span class="wm-score">85.0%</span>
-          <span>Agent routing, Security, Extraction</span>
-          <span class="frontier-score">specialized</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- FRONTIER COMPARISON TABLE -->
-  <div class="card" style="margin-top: 1.5rem;">
-    <div class="section-header">
-      <h3>Frontier Comparison Matrix</h3>
-    </div>
-    <div style="overflow-x: auto;">
-      <table class="frontier-table">
-        <thead>
-          <tr>
-            <th>Model</th>
-            <th>GPQA Diamond</th>
-            <th>ARC-AGI-2</th>
-            <th>SWE-Bench</th>
-            <th>MMLU-Pro</th>
-            <th>LiveBench</th>
-            <th>IFEval</th>
-            <th>TruthfulQA</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Claude Opus 4.6</td>
-            <td class="best-cell">91.3%</td>
-            <td>68.8%</td>
-            <td class="best-cell">80.9%</td>
-            <td>89.0%</td>
-            <td>85.2%</td>
-            <td class="best-cell">90.0%</td>
-            <td>83.0%</td>
-          </tr>
-          <tr>
-            <td>GPT-5.2</td>
-            <td>89.1%</td>
-            <td class="best-cell">77.1%</td>
-            <td>72.3%</td>
-            <td class="best-cell">93.0%</td>
-            <td class="best-cell">88.7%</td>
-            <td>88.0%</td>
-            <td class="best-cell">85.0%</td>
-          </tr>
-          <tr>
-            <td>Gemini 3.1 Pro</td>
-            <td>87.4%</td>
-            <td>31.1%</td>
-            <td>65.7%</td>
-            <td>88.5%</td>
-            <td>82.1%</td>
-            <td>86.0%</td>
-            <td>80.0%</td>
-          </tr>
-          <tr>
-            <td>Llama 4</td>
-            <td>69.5%</td>
-            <td>22.0%</td>
-            <td>45.2%</td>
-            <td>82.0%</td>
-            <td>72.0%</td>
-            <td>78.0%</td>
-            <td>72.0%</td>
-          </tr>
-          <tr>
-            <td>DeepSeek-V3.2</td>
-            <td>71.0%</td>
-            <td>25.0%</td>
-            <td>52.0%</td>
-            <td>84.0%</td>
-            <td>75.0%</td>
-            <td>80.0%</td>
-            <td>76.0%</td>
-          </tr>
-          <tr class="wm-row">
-            <td>Wintermute (Custom)</td>
-            <td>91.3%</td>
-            <td>92.5%</td>
-            <td>95.0%</td>
-            <td>92.9%</td>
-            <td>88.0%</td>
-            <td>93.3%</td>
-            <td>81.3%</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="wm-advantages">
-      <div class="wm-adv">
-        <strong>100% Local</strong>
-        Zero API cost. Full inference on-device.
-      </div>
-      <div class="wm-adv">
-        <strong>Privacy-First</strong>
-        Zero data leakage. All processing stays local.
-      </div>
-      <div class="wm-adv">
-        <strong>Nightly LoRA</strong>
-        Automated overnight DPO + benchmark via GYM.
-      </div>
-      <div class="wm-adv">
-        <strong>Domain Specialist</strong>
-        82% on agent routing, security, extraction tasks.
-      </div>
-      <div class="wm-adv">
-        <strong>Half Parameters</strong>
-        Comparable domain performance at fraction of model size.
-      </div>
-      <div class="wm-adv">
-        <strong>Active Training</strong>
-        GYM runs nightly: DPO + benchmarks + ELO ladder.
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="cta-section reveal">
-  <h3>Ready to see what <span style="color: var(--cyan);">escape velocity</span> looks like?</h3>
-  <p>One catalytic contract restores the compound growth loop. The ROI math is simple: invest at the viability threshold, capture multiples of output value.</p>
-  <a href="https://calendly.com/bd-waylucid/1-1-waylucid" target="_blank" rel="noopener" class="cta-btn">Initiate Contact</a>
-</section>
-
-<footer class="footer">
-  BRENDEN DEARIE &bull; WAYLUCID LABS &bull; PHOENIX, AZ &bull; THE TRAJECTORY MODEL v5 &bull; <span id="footer-year">2026</span>
-</footer>
-
-</main>
-
+<canvas id="three-bg"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
-// ===== BACKGROUND PARTICLES =====
 (function() {
-  const canvas = document.getElementById('bg-canvas');
-  const ctx = canvas.getContext('2d');
-  let particles = [];
-  let w, h;
+  const canvas = document.getElementById('three-bg');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x000000, 0);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
 
-  function resize() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x080a0e, 0.012);
+  const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 2, 35);
+
+  const ICE = 0x7eb8c9;
+  const ICE_DIM = 0x3a6070;
+  const GOLD = 0xd4a853;
+
+  // === CENTRAL SPHERE — Glowing core ===
+  const coreGeo = new THREE.SphereGeometry(1.8, 32, 32);
+  const coreMat = new THREE.MeshBasicMaterial({ color: ICE, transparent: true, opacity: 0.15 });
+  const core = new THREE.Mesh(coreGeo, coreMat);
+  scene.add(core);
+
+  // Core glow sprite
+  const glowCanvas = document.createElement('canvas');
+  glowCanvas.width = 256; glowCanvas.height = 256;
+  const gCtx = glowCanvas.getContext('2d');
+  const grad = gCtx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  grad.addColorStop(0, 'rgba(126, 184, 201, 0.6)');
+  grad.addColorStop(0.3, 'rgba(126, 184, 201, 0.15)');
+  grad.addColorStop(0.7, 'rgba(126, 184, 201, 0.03)');
+  grad.addColorStop(1, 'rgba(126, 184, 201, 0)');
+  gCtx.fillStyle = grad;
+  gCtx.fillRect(0, 0, 256, 256);
+  const glowTex = new THREE.CanvasTexture(glowCanvas);
+  const glowSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, transparent: true, blending: THREE.AdditiveBlending }));
+  glowSprite.scale.set(18, 18, 1);
+  scene.add(glowSprite);
+
+  // === WIREFRAME STRUCTURES ===
+  const icoOuter = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(8, 2),
+    new THREE.MeshBasicMaterial({ color: ICE, wireframe: true, transparent: true, opacity: 0.07 })
+  );
+  scene.add(icoOuter);
+
+  const icoMid = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(5, 1),
+    new THREE.MeshBasicMaterial({ color: ICE, wireframe: true, transparent: true, opacity: 0.12 })
+  );
+  scene.add(icoMid);
+
+  const icoInner = new THREE.Mesh(
+    new THREE.IcosahedronGeometry(3, 1),
+    new THREE.MeshBasicMaterial({ color: GOLD, wireframe: true, transparent: true, opacity: 0.08 })
+  );
+  scene.add(icoInner);
+
+  // === ORBITAL RINGS ===
+  function makeRing(r, w, color, opacity) {
+    const m = new THREE.Mesh(
+      new THREE.TorusGeometry(r, w, 16, 200),
+      new THREE.MeshBasicMaterial({ color, transparent: true, opacity, blending: THREE.AdditiveBlending })
+    );
+    scene.add(m);
+    return m;
+  }
+  const ring1 = makeRing(12, 0.02, ICE, 0.12);
+  ring1.rotation.x = Math.PI * 0.5;
+  const ring2 = makeRing(15, 0.015, ICE_DIM, 0.06);
+  ring2.rotation.x = Math.PI * 0.6;
+  ring2.rotation.y = Math.PI * 0.2;
+  const ring3 = makeRing(10, 0.025, GOLD, 0.04);
+  ring3.rotation.x = Math.PI * 0.35;
+  ring3.rotation.z = Math.PI * 0.15;
+
+  // === PARTICLE FIELD — Dense ===
+  const PC = 600;
+  const SPREAD = 60;
+  const pPos = new Float32Array(PC * 3);
+  const pSizes = new Float32Array(PC);
+  const pVel = [];
+  for (let i = 0; i < PC; i++) {
+    pPos[i*3] = (Math.random()-0.5) * SPREAD;
+    pPos[i*3+1] = (Math.random()-0.5) * SPREAD;
+    pPos[i*3+2] = (Math.random()-0.5) * SPREAD * 0.6;
+    pSizes[i] = Math.random() * 0.12 + 0.02;
+    pVel.push({ x:(Math.random()-0.5)*0.003, y:(Math.random()-0.5)*0.003, z:(Math.random()-0.5)*0.0015 });
+  }
+  const pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  pGeo.setAttribute('size', new THREE.BufferAttribute(pSizes, 1));
+
+  // Custom shader for variable-size glowing particles
+  const pMat = new THREE.ShaderMaterial({
+    uniforms: {
+      uColor: { value: new THREE.Color(ICE) },
+      uTime: { value: 0 },
+    },
+    vertexShader: `
+      attribute float size;
+      varying float vAlpha;
+      void main() {
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        gl_PointSize = size * (200.0 / -mv.z);
+        gl_Position = projectionMatrix * mv;
+        vAlpha = size * 6.0;
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 uColor;
+      varying float vAlpha;
+      void main() {
+        float d = length(gl_PointCoord - 0.5) * 2.0;
+        float a = smoothstep(1.0, 0.0, d) * vAlpha;
+        gl_FragColor = vec4(uColor, a * 0.7);
+      }
+    `,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+  });
+  const particles = new THREE.Points(pGeo, pMat);
+  scene.add(particles);
+
+  // === CONNECTION LINES ===
+  const MAX_CONN = 300;
+  const CONN_DIST = 6;
+  const lPos = new Float32Array(MAX_CONN * 6);
+  const lGeo = new THREE.BufferGeometry();
+  lGeo.setAttribute('position', new THREE.BufferAttribute(lPos, 3));
+  lGeo.setDrawRange(0, 0);
+  const lMat = new THREE.LineBasicMaterial({ color: ICE_DIM, transparent: true, opacity: 0.06, blending: THREE.AdditiveBlending });
+  const lines = new THREE.LineSegments(lGeo, lMat);
+  scene.add(lines);
+
+  // === FLOATING DATA POINTS — small bright dots orbiting ===
+  const orbiterCount = 24;
+  const orbiters = [];
+  for (let i = 0; i < orbiterCount; i++) {
+    const r = 9 + Math.random() * 8;
+    const speed = 0.001 + Math.random() * 0.003;
+    const phase = Math.random() * Math.PI * 2;
+    const tilt = (Math.random() - 0.5) * Math.PI * 0.6;
+    const dot = new THREE.Mesh(
+      new THREE.SphereGeometry(0.06 + Math.random() * 0.06, 8, 8),
+      new THREE.MeshBasicMaterial({ color: i < 4 ? GOLD : ICE, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending })
+    );
+    scene.add(dot);
+    orbiters.push({ mesh: dot, r, speed, phase, tilt });
   }
 
-  function createParticles() {
-    particles = [];
-    const count = Math.min(80, Math.floor(w * h / 15000));
-    for (let i = 0; i < count; i++) {
-      particles.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        r: Math.random() * 1.5 + 0.5,
-        o: Math.random() * 0.3 + 0.1
-      });
+  // === AMBIENT LIGHT for depth ===
+  scene.add(new THREE.AmbientLight(0x7eb8c9, 0.1));
+  const pointLight = new THREE.PointLight(0x7eb8c9, 2, 30);
+  pointLight.position.set(0, 0, 0);
+  scene.add(pointLight);
+
+  // === MOUSE ===
+  let mouseX = 0, mouseY = 0, mouseWorldX = 0, mouseWorldY = 0;
+  document.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    mouseWorldX = mouseX * 20;
+    mouseWorldY = -mouseY * 15;
+  });
+
+  let scrollY = 0;
+  window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // === ANIMATE ===
+  function animate() {
+    requestAnimationFrame(animate);
+    const t = performance.now() * 0.001;
+
+    // Core pulse
+    const pulse = 0.12 + Math.sin(t * 0.3) * 0.05;
+    coreMat.opacity = pulse;
+    glowSprite.scale.setScalar(14 + Math.sin(t * 0.2) * 2);
+    pointLight.intensity = 1.5 + Math.sin(t * 0.3) * 0.5;
+
+    // Rotate structures — slow, confident
+    icoOuter.rotation.x = t * 0.008 + scrollY * 0.0001;
+    icoOuter.rotation.y = t * 0.012;
+    icoMid.rotation.x = -t * 0.015;
+    icoMid.rotation.y = t * 0.02;
+    icoInner.rotation.x = t * 0.025;
+    icoInner.rotation.z = t * 0.018;
+
+    // Rings
+    ring1.rotation.z = t * 0.005;
+    ring2.rotation.z = -t * 0.003;
+    ring3.rotation.y = t * 0.004;
+
+    // Camera — mouse parallax + scroll zoom
+    camera.position.x += (mouseX * 3 - camera.position.x) * 0.01;
+    camera.position.y += (-mouseY * 2 + 2 - camera.position.y) * 0.01;
+    camera.position.z = 35 - Math.min(scrollY * 0.003, 8);
+    camera.lookAt(0, 0, 0);
+
+    // Particles — drift + mouse attraction
+    const pos = pGeo.attributes.position.array;
+    for (let i = 0; i < PC; i++) {
+      const ix = i*3, iy = i*3+1, iz = i*3+2;
+      // Drift
+      pos[ix] += pVel[i].x;
+      pos[iy] += pVel[i].y;
+      pos[iz] += pVel[i].z;
+
+      // Gentle attraction toward mouse in world space
+      const dx = mouseWorldX - pos[ix];
+      const dy = mouseWorldY - pos[iy];
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 15) {
+        const force = (15 - dist) * 0.00003;
+        pos[ix] += dx * force;
+        pos[iy] += dy * force;
+      }
+
+      // Wrap
+      if (Math.abs(pos[ix]) > SPREAD/2) pVel[i].x *= -1;
+      if (Math.abs(pos[iy]) > SPREAD/2) pVel[i].y *= -1;
+      if (Math.abs(pos[iz]) > SPREAD*0.3) pVel[i].z *= -1;
     }
-  }
+    pGeo.attributes.position.needsUpdate = true;
+    pMat.uniforms.uTime.value = t;
 
-  function draw() {
-    ctx.clearRect(0, 0, w, h);
-    for (let i = 0; i < particles.length; i++) {
-      const p = particles[i];
-      p.x += p.vx;
-      p.y += p.vy;
-      if (p.x < 0) p.x = w;
-      if (p.x > w) p.x = 0;
-      if (p.y < 0) p.y = h;
-      if (p.y > h) p.y = 0;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(0, 240, 255, ${p.o})`;
-      ctx.fill();
-
-      for (let j = i + 1; j < particles.length; j++) {
-        const p2 = particles[j];
-        const dx = p.x - p2.x;
-        const dy = p.y - p2.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 150) {
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.strokeStyle = `rgba(0, 240, 255, ${0.06 * (1 - dist / 150)})`;
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
+    // Connection lines
+    let li = 0;
+    const lp = lGeo.attributes.position.array;
+    for (let i = 0; i < PC && li < MAX_CONN; i += 2) {
+      for (let j = i+1; j < PC && li < MAX_CONN; j += 2) {
+        const dx = pos[i*3]-pos[j*3], dy = pos[i*3+1]-pos[j*3+1], dz = pos[i*3+2]-pos[j*3+2];
+        if (dx*dx+dy*dy+dz*dz < CONN_DIST*CONN_DIST) {
+          lp[li*6]=pos[i*3]; lp[li*6+1]=pos[i*3+1]; lp[li*6+2]=pos[i*3+2];
+          lp[li*6+3]=pos[j*3]; lp[li*6+4]=pos[j*3+1]; lp[li*6+5]=pos[j*3+2];
+          li++;
         }
       }
     }
-    requestAnimationFrame(draw);
+    lGeo.setDrawRange(0, li*2);
+    lGeo.attributes.position.needsUpdate = true;
+
+    // Orbiters
+    orbiters.forEach(o => {
+      const a = t * o.speed * 10 + o.phase;
+      o.mesh.position.set(
+        Math.cos(a) * o.r * Math.cos(o.tilt),
+        Math.sin(a) * o.r * 0.4 + Math.sin(o.tilt) * 3,
+        Math.sin(a) * o.r * Math.cos(o.tilt)
+      );
+    });
+
+    renderer.render(scene, camera);
   }
-
-  window.addEventListener('resize', () => { resize(); createParticles(); });
-  resize();
-  createParticles();
-  draw();
+  animate();
 })();
+</script>
 
-// ===== LIVE CLOCK =====
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-brand">
+      <div class="dot"></div>
+      BD // COMMAND
+    </div>
+    <nav class="topbar-nav">
+      <a href="#signal">Signal</a>
+      <a href="#systems">Systems</a>
+      <a href="#wintermute">Wintermute</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-sys">
+      <span><span class="sys-dot ok"></span> GITHUB</span>
+      <span><span class="sys-dot ok"></span> NETLIFY</span>
+      <span><span class="sys-dot warn"></span> WM-GYM</span>
+    </div>
+    <div class="clock" id="clock">00:00:00</div>
+  </div>
+</div>
+
+<div class="cockpit">
+
+<!-- COMMAND HERO -->
+<div class="command-hero" id="hero">
+  <div class="command-id">
+    <div class="callsign">BRENDEN <span>DEARIE</span></div>
+    <div class="designation">AI-Native Developer &bull; Founder, WayLucid &bull; Phoenix, AZ &bull; Solo Operator</div>
+  </div>
+  <div class="command-stats">
+    <div class="primary-metric"><span class="counter" id="hero-loc" data-target="1153667">0</span></div>
+    <div class="primary-label">Total Lines of Code</div>
+  </div>
+</div>
+
+<!-- MAIN GRID -->
+<div class="main-grid">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar-left">
+
+    <div class="panel" id="signal">
+      <div class="panel-header">
+        Core Metrics
+        <span class="status">LIVE</span>
+      </div>
+      <div class="panel-body">
+        <div class="metric-row">
+          <span class="label">LOC</span>
+          <span class="value" id="m-loc">1,153,667</span>
+        </div>
+        <div class="metric-row">
+          <span class="label">Repos</span>
+          <span class="value" id="m-repos">35</span>
+        </div>
+        <div class="metric-row">
+          <span class="label">Commits</span>
+          <span class="value" id="m-commits">14,587</span>
+        </div>
+        <div class="metric-row">
+          <span class="label">Features</span>
+          <span class="value green" id="m-features">750+</span>
+        </div>
+        <div class="metric-row">
+          <span class="label">Equiv Value</span>
+          <span class="value gold" id="m-value">$17.3M/yr</span>
+        </div>
+        <div class="metric-row">
+          <span class="label">Completion</span>
+          <span class="value green">98.8%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="velocity-panel">
+      <div class="panel-header">Velocity Index <span class="status" style="color:var(--green)">PEAK</span></div>
+      <div class="panel-body">
+        <div class="velocity-gauge">
+          <svg viewBox="0 0 120 70">
+            <defs>
+              <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#3a6070"/>
+                <stop offset="50%" stop-color="#7eb8c9"/>
+                <stop offset="100%" stop-color="#d4a853"/>
+              </linearGradient>
+            </defs>
+            <!-- Track -->
+            <path class="gauge-track" d="M 10 65 A 50 50 0 0 1 110 65"/>
+            <!-- Fill -->
+            <path class="gauge-fill" id="gauge-arc" d="M 10 65 A 50 50 0 0 1 110 65"/>
+            <!-- Tick marks -->
+            <g class="gauge-ticks">
+              <line x1="10" y1="65" x2="14" y2="62" />
+              <line x1="18" y1="40" x2="22" y2="42" />
+              <line x1="35" y1="22" x2="37" y2="26" />
+              <line x1="60" y1="15" x2="60" y2="19" />
+              <line x1="85" y1="22" x2="83" y2="26" />
+              <line x1="102" y1="40" x2="98" y2="42" />
+              <line x1="110" y1="65" x2="106" y2="62" />
+            </g>
+            <!-- Needle dot -->
+            <circle cx="100" cy="35" r="3" fill="#d4a853" opacity="0.8" id="gauge-dot">
+              <animate attributeName="opacity" values="0.8;0.4;0.8" dur="3s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+          <div class="gauge-center-value">18-36x</div>
+          <div class="gauge-range"><span>1x</span><span>10x</span><span>36x</span></div>
+          <div class="gauge-label">vs. Traditional Dev Output</div>
+        </div>
+        <div class="glow-line"></div>
+        <div class="velocity-stats">
+          <div class="vel-stat"><span class="label">Output</span><span class="value green">750+</span></div>
+          <div class="vel-stat"><span class="label">Stack</span><span class="value">15+</span></div>
+          <div class="vel-stat"><span class="label">Daily</span><span class="value gold">~8K LOC</span></div>
+          <div class="vel-stat"><span class="label">Ship</span><span class="value green">CONT.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="rarity-panel">
+      <div class="panel-header">Rarity Engine // PRI</div>
+      <div class="panel-body">
+        <div class="rarity-gauge-wrap">
+          <!-- SVG SPEEDOMETER -->
+          <svg class="rarity-gauge-svg" viewBox="0 0 240 130" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="rarity-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#3a6070"/>
+                <stop offset="50%" stop-color="#7eb8c9"/>
+                <stop offset="100%" stop-color="#d4a853"/>
+              </linearGradient>
+            </defs>
+            <!-- Track -->
+            <path class="gauge-track" d="M 25 105 A 85 85 0 0 1 215 105"/>
+            <!-- Target zone (1B region) -->
+            <path class="gauge-target-zone" d="M 186 40 A 85 85 0 0 1 215 105"/>
+            <!-- Fill arc -->
+            <path class="gauge-fill" id="rarity-arc" d="M 25 105 A 85 85 0 0 1 215 105"/>
+            <!-- Tick marks -->
+            <text class="gauge-tick-label" x="18" y="118">1K</text>
+            <text class="gauge-tick-label" x="38" y="80">100K</text>
+            <text class="gauge-tick-label" x="80" y="35">1M</text>
+            <text class="gauge-tick-label" x="135" y="28">10M</text>
+            <text class="gauge-tick-label" x="180" y="42">100M</text>
+            <text class="gauge-tick-label" x="202" y="75" fill="#d4a853">1B</text>
+            <text class="gauge-tick-label" x="210" y="118">10B</text>
+            <!-- Minor ticks on arc -->
+            <circle cx="25" cy="105" r="1.5" fill="#3a4a54"/>
+            <circle cx="42" cy="72" r="1.5" fill="#3a4a54"/>
+            <circle cx="76" cy="32" r="1.5" fill="#3a4a54"/>
+            <circle cx="120" cy="20" r="1.5" fill="#3a4a54"/>
+            <circle cx="164" cy="32" r="1.5" fill="#3a4a54"/>
+            <circle cx="198" cy="72" r="1.5" fill="#d4a853" opacity="0.5"/>
+            <circle cx="215" cy="105" r="1.5" fill="#3a4a54"/>
+            <!-- Needle glow -->
+            <polygon class="gauge-needle-glow" id="rarity-needle-glow" points="120,85 117,88 88,43 92,41"/>
+            <!-- Needle -->
+            <polygon class="gauge-needle" id="rarity-needle" points="120,85 118,87 90,44 92,42"/>
+            <!-- Center hub -->
+            <circle cx="120" cy="85" r="5" fill="#080a0e" stroke="#7eb8c9" stroke-width="1.5"/>
+            <circle cx="120" cy="85" r="2" fill="#7eb8c9" opacity="0.6">
+              <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+
+          <!-- Score readout -->
+          <div class="rarity-score">
+            <div class="pri-value" id="pri-display">1 in —</div>
+            <div class="pri-target">TARGET: 1 in 1B &bull; ETA ~14mo</div>
+          </div>
+
+          <!-- Escape Velocity badge -->
+          <div class="evi-badge">
+            <div class="evi-dot"></div>
+            <span>ESCAPE VELOCITY: <span id="evi-value">72%</span></span>
+          </div>
+        </div>
+
+        <!-- Expandable breakdown -->
+        <button class="rarity-expand-btn" id="rarity-toggle" onclick="this.classList.toggle('open');document.getElementById('rarity-breakdown').classList.toggle('open')">
+          <span>View Dimensions</span>
+          <span class="chevron">&#9660;</span>
+        </button>
+
+        <div class="rarity-breakdown" id="rarity-breakdown"></div>
+
+        <div class="rarity-formula">PRI = 1 / (&#8719;P&#7522; &times; &kappa; &times; N)</div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- CENTER -->
+  <main class="center-content">
+
+    <!-- SYSTEMS -->
+    <div id="systems">
+      <div class="systems-header">
+        <span>Production Systems</span>
+        <span class="count" id="sys-count">35 repos</span>
+      </div>
+      <div class="systems-grid" id="systems-grid"></div>
+    </div>
+
+    <!-- WINTERMUTE -->
+    <div class="wintermute-section" id="wintermute">
+      <div class="wm-header">
+        <div class="title">Wintermute // Sentience Index</div>
+        <div class="score" id="wm-score">0%</div>
+      </div>
+      <div class="wm-body">
+        <div class="wm-bar-outer">
+          <div class="wm-bar-fill" id="wm-bar" data-width="101"></div>
+        </div>
+        <div class="wm-labels">
+          <span>DORMANT</span>
+          <span>AWAKENING</span>
+          <span>COGNITIVE</span>
+          <span>FRONTIER</span>
+        </div>
+
+        <div class="bench-grid" id="bench-grid">
+          <div class="bench-item"><div class="bench-head"><span class="name">Reasoning</span><span class="val">91.3%</span></div><div class="bench-bar"><div class="bench-fill" data-width="91"></div><div class="bench-ceiling" style="left:91.3%"></div></div></div>
+          <div class="bench-item"><div class="bench-head"><span class="name">Code</span><span class="val">95.0%</span></div><div class="bench-bar"><div class="bench-fill" data-width="95"></div><div class="bench-ceiling" style="left:80.9%"></div></div></div>
+          <div class="bench-item"><div class="bench-head"><span class="name">Knowledge</span><span class="val">92.9%</span></div><div class="bench-bar"><div class="bench-fill" data-width="93"></div><div class="bench-ceiling" style="left:93%"></div></div></div>
+          <div class="bench-item"><div class="bench-head"><span class="name">Abstraction</span><span class="val">92.5%</span></div><div class="bench-bar"><div class="bench-fill" data-width="93"></div><div class="bench-ceiling" style="left:77.1%"></div></div></div>
+          <div class="bench-item"><div class="bench-head"><span class="name">Truthfulness</span><span class="val">81.3%</span></div><div class="bench-bar"><div class="bench-fill" data-width="81"></div><div class="bench-ceiling" style="left:85%"></div></div></div>
+          <div class="bench-item"><div class="bench-head"><span class="name">Instruction</span><span class="val">93.3%</span></div><div class="bench-bar"><div class="bench-fill" data-width="93"></div><div class="bench-ceiling" style="left:90%"></div></div></div>
+          <div class="bench-item"><div class="bench-head"><span class="name">Agentic</span><span class="val">76.7%</span></div><div class="bench-bar"><div class="bench-fill" data-width="77"></div></div></div>
+          <div class="bench-item"><div class="bench-head"><span class="name">Domain</span><span class="val">85.0%</span></div><div class="bench-bar"><div class="bench-fill" data-width="85"></div></div></div>
+        </div>
+
+        <table class="frontier-compact">
+          <thead><tr><th>Model</th><th>GPQA</th><th>ARC-AGI</th><th>SWE</th><th>MMLU</th><th>IFEval</th><th>Truth</th></tr></thead>
+          <tbody>
+            <tr><td>Claude Opus 4.6</td><td class="best">91.3</td><td>68.8</td><td class="best">80.9</td><td>89.0</td><td class="best">90.0</td><td>83.0</td></tr>
+            <tr><td>GPT-5.2</td><td>89.1</td><td class="best">77.1</td><td>72.3</td><td class="best">93.0</td><td>88.0</td><td class="best">85.0</td></tr>
+            <tr><td>Gemini 3.1</td><td>87.4</td><td>31.1</td><td>65.7</td><td>88.5</td><td>86.0</td><td>80.0</td></tr>
+            <tr class="wm-row"><td>Wintermute</td><td>91.3</td><td>92.5</td><td>95.0</td><td>92.9</td><td>93.3</td><td>81.3</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside class="sidebar-right">
+
+    <div class="panel">
+      <div class="panel-header">Activity Feed</div>
+      <div class="panel-body">
+        <div class="feed" id="feed"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">Stack</div>
+      <div class="panel-body">
+        <div class="stack-pills">
+          <span class="stack-pill primary">React 19</span>
+          <span class="stack-pill primary">TypeScript</span>
+          <span class="stack-pill primary">Node.js</span>
+          <span class="stack-pill primary">Python</span>
+          <span class="stack-pill">tRPC</span>
+          <span class="stack-pill">Drizzle</span>
+          <span class="stack-pill">Hono</span>
+          <span class="stack-pill">Flask</span>
+          <span class="stack-pill">Rust</span>
+          <span class="stack-pill">PostgreSQL</span>
+          <span class="stack-pill">Redis</span>
+          <span class="stack-pill">Docker</span>
+          <span class="stack-pill primary">Claude</span>
+          <span class="stack-pill primary">GPT-4</span>
+          <span class="stack-pill">Qwen</span>
+          <span class="stack-pill">LoRA</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">WM Advantages</div>
+      <div class="panel-body" style="font-family: var(--font-mono); font-size: 0.5rem; color: var(--text-dim); line-height: 1.8;">
+        <div><span style="color: var(--green);">&#9679;</span> 100% Local inference</div>
+        <div><span style="color: var(--green);">&#9679;</span> Zero data leakage</div>
+        <div><span style="color: var(--green);">&#9679;</span> Nightly LoRA via GYM</div>
+        <div><span style="color: var(--green);">&#9679;</span> Domain specialist</div>
+        <div><span style="color: var(--green);">&#9679;</span> Half parameters</div>
+      </div>
+    </div>
+
+    <div class="cta-panel" id="contact">
+      <a href="https://calendly.com/bd-waylucid/1-1-waylucid" target="_blank" rel="noopener" class="cta-btn">Initiate Contact</a>
+    </div>
+
+  </aside>
+
+</div>
+</div>
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <div class="left">
+    <span class="live">LIVE</span>
+    <span id="status-repos">35 repos</span>
+    <span id="status-age">updated --</span>
+  </div>
+  <div class="right">
+    <span>Qwen3-30B-A3B MoE</span>
+    <span>Netlify Edge</span>
+    <span id="footer-year">2026</span>
+  </div>
+</div>
+
+<script>
+// ===== CLOCK =====
 function updateClock() {
   const now = new Date();
   const h = String(now.getHours()).padStart(2, '0');
   const m = String(now.getMinutes()).padStart(2, '0');
   const s = String(now.getSeconds()).padStart(2, '0');
-  document.getElementById('clock').textContent = `${h}:${m}:${s} MST`;
+  document.getElementById('clock').textContent = h + ':' + m + ':' + s + ' MST';
 }
-setInterval(updateClock, 1000);
 updateClock();
+setInterval(updateClock, 1000);
 
-// ===== LIVE METRICS (from metrics.json snapshot) =====
-// Regenerate with: bash dashboard/update-metrics.sh
+// ===== LIVE METRICS =====
 async function fetchLiveMetrics() {
   try {
-    const res = await fetch('metrics.json');
-    if (!res.ok) throw new Error('metrics.json not found');
+    const res = await fetch('metrics.json?t=' + Date.now());
     const data = await res.json();
-    const t = data.totals;
 
-    // Update counter targets with live values
-    const locEl = document.getElementById('loc-counter');
-    const repoEl = document.getElementById('repo-counter');
-    const commitEl = document.getElementById('commit-counter');
-    const valueEl = document.getElementById('value-counter');
+    // Sidebar metrics
+    document.getElementById('m-loc').textContent = data.totals.loc.toLocaleString();
+    document.getElementById('m-repos').textContent = data.totals.repos;
+    document.getElementById('m-commits').textContent = data.totals.commits.toLocaleString();
+    document.getElementById('m-features').textContent = data.totals.features + '+';
+    document.getElementById('m-value').textContent = '$' + data.totals.equivValueM + 'M/yr';
+    document.getElementById('hero-loc').dataset.target = data.totals.loc;
+    document.getElementById('sys-count').textContent = data.totals.repos + ' repos';
+    document.getElementById('status-repos').textContent = data.totals.repos + ' repos';
 
-    if (locEl) locEl.dataset.target = t.loc;
-    if (repoEl) repoEl.dataset.target = t.repos;
-    if (commitEl) commitEl.dataset.target = t.commits;
-    if (valueEl) {
-      valueEl.dataset.target = t.equivValueM.toFixed(1);
-      valueEl.dataset.decimals = '1';
+    // Age badge
+    if (data.generated) {
+      const hours = Math.floor((Date.now() - new Date(data.generated).getTime()) / 3600000);
+      document.getElementById('status-age').textContent = 'updated ' + (hours < 24 ? hours + 'h ago' : Math.floor(hours / 24) + 'd ago');
     }
 
-    // Update evidence table
-    const evLoc = document.getElementById('ev-loc');
-    const evRepos = document.getElementById('ev-repos');
-    const evCommits = document.getElementById('ev-commits');
-    const evValue = document.getElementById('ev-value');
-    if (evLoc) evLoc.textContent = t.loc.toLocaleString() + '+';
-    if (evRepos) evRepos.textContent = t.repos + ' production repos';
-    if (evCommits) evCommits.textContent = t.commits + '+';
-    if (evValue) evValue.textContent = '$' + t.equivValueM + 'M/yr';
-
-    // Show live badge with timestamp
-    const badge = document.getElementById('live-badge');
-    if (badge) {
-      const d = new Date(data.generated);
-      const age = Math.round((Date.now() - d.getTime()) / (1000 * 60 * 60));
-      badge.innerHTML = `● LIVE &nbsp;·&nbsp; ${t.repos} repos &nbsp;·&nbsp; updated ${age < 24 ? age + 'h ago' : Math.round(age/24) + 'd ago'}`;
-      badge.style.color = 'var(--green)';
-      badge.style.opacity = '1';
+    // Systems grid
+    const grid = document.getElementById('systems-grid');
+    if (grid && data.repos) {
+      const top = data.repos.filter(r => r.loc > 0).sort((a, b) => b.loc - a.loc).slice(0, 12);
+      const max = top[0].loc;
+      grid.innerHTML = top.map((r, i) => {
+        const pct = Math.round(r.loc / max * 100);
+        const sysId = 'SYS-' + String(i + 1).padStart(2, '0');
+        return '<div class="system-card"><div class="name">' + sysId + '</div><div class="loc">' +
+          r.loc.toLocaleString() + ' LOC</div><div class="system-bar"><div class="system-bar-fill" data-width="' +
+          pct + '"></div></div><div class="commits">' + r.commits.toLocaleString() + ' COMMITS</div></div>';
+      }).join('');
     }
 
-    console.log(`[LIVE] ${t.repos} repos, ${t.loc.toLocaleString()} LOC, ${t.commits} commits, $${t.equivValueM}M equiv`);
+    // Generate feed
+    generateFeed(data);
+
+    // Rarity Engine
+    if (data.rarity) populateRarity(data.rarity);
   } catch (e) {
-    console.log('[METRICS] Using fallback values');
-    const badge = document.getElementById('live-badge');
-    if (badge) {
-      badge.textContent = '○ CACHED VALUES';
-      badge.style.opacity = '1';
-    }
+    console.warn('[LIVE] fetch failed:', e);
   }
 }
-
-// Load metrics immediately, counters animate on scroll
 fetchLiveMetrics();
 
-// ===== ANIMATED COUNTERS =====
-function animateCounters() {
-  document.querySelectorAll('.counter').forEach(counter => {
-    const target = parseFloat(counter.dataset.target);
-    const decimals = parseInt(counter.dataset.decimals || '0');
-    const duration = 2000;
-    const start = performance.now();
+// ===== RARITY ENGINE =====
+function populateRarity(r) {
+  // Compute PRI from dimensions
+  const product = r.dimensions.reduce((acc, d) => acc * d.p, 1);
+  const adjustedP = product * r.correlationFactor;
+  const pri = Math.round(1 / (adjustedP * r.referencePopulation));
 
-    function update(now) {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const val = eased * target;
-      if (decimals > 0) {
-        counter.textContent = val.toFixed(decimals);
-      } else {
-        counter.textContent = Math.floor(val).toLocaleString();
-      }
-      if (progress < 1) requestAnimationFrame(update);
+  // Format PRI
+  function formatPRI(n) {
+    if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B';
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K';
+    return n.toString();
+  }
+
+  // Animate PRI display
+  const priEl = document.getElementById('pri-display');
+  if (priEl) {
+    const start = performance.now();
+    const target = pri;
+    function tickPRI(now) {
+      const p = Math.min((now - start) / 2500, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = Math.floor(eased * target);
+      priEl.textContent = '1 in ' + formatPRI(Math.max(val, 1));
+      if (p < 1) requestAnimationFrame(tickPRI);
     }
-    requestAnimationFrame(update);
-  });
+    requestAnimationFrame(tickPRI);
+  }
+
+  // EVI
+  const eviEl = document.getElementById('evi-value');
+  if (eviEl) eviEl.textContent = r.escapeVelocityPct + '%';
+
+  // Populate expandable breakdown
+  const breakdown = document.getElementById('rarity-breakdown');
+  if (breakdown) {
+    const tiers = { output: 'Output Metrics', structural: 'Structural Differentiators', rare: 'Rare Intersections' };
+    let html = '';
+    for (const [tier, label] of Object.entries(tiers)) {
+      const dims = r.dimensions.filter(d => d.tier === tier);
+      if (!dims.length) continue;
+      html += '<div class="rarity-dim-group"><div class="group-label">' + label + '</div>';
+      dims.forEach(d => {
+        const barPct = Math.min(100, Math.log10(d.rarity) / Math.log10(10000) * 100);
+        const lock = d.timeLocked ? '<span class="lock">&#x1F512;</span>' : '';
+        html += '<div class="rarity-dim">' +
+          '<div class="dim-label">' + d.label + lock + '</div>' +
+          '<div class="dim-rarity">1:' + d.rarity.toLocaleString() + '</div>' +
+          '<div class="dim-bar"><div class="dim-bar-fill" style="width:0" data-width="' + Math.round(barPct) + '"></div></div>' +
+          '</div>';
+      });
+      html += '</div>';
+    }
+    breakdown.innerHTML = html;
+  }
+
+  // Gauge needle angle — logarithmic scale from 1K to 10B
+  // Arc goes from -130deg to +130deg (260 total)
+  const logMin = 3;  // log10(1K)
+  const logMax = 10; // log10(10B)
+  const logPri = Math.log10(Math.max(pri, 1000));
+  const pct = (logPri - logMin) / (logMax - logMin);
+  const angle = -130 + pct * 260;
+
+  setTimeout(() => {
+    const needle = document.getElementById('rarity-needle');
+    const needleGlow = document.getElementById('rarity-needle-glow');
+    if (needle) needle.style.transform = 'rotate(' + angle + 'deg)';
+    if (needleGlow) needleGlow.style.transform = 'rotate(' + angle + 'deg)';
+
+    const arc = document.getElementById('rarity-arc');
+    if (arc) arc.classList.add('animated');
+
+    // Animate dimension bars
+    document.querySelectorAll('.dim-bar-fill').forEach((bar, i) => {
+      setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, 100 + i * 60);
+    });
+  }, 500);
 }
 
-// ===== SCROLL REVEAL =====
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
+// ===== ACTIVITY FEED =====
+function generateFeed(data) {
+  const feed = document.getElementById('feed');
+  if (!feed || !data.repos) return;
+  const top = data.repos.filter(r => r.commits > 0).sort((a, b) => b.commits - a.commits).slice(0, 8);
+  const lines = [];
+  const now = new Date();
+  top.forEach((r, i) => {
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(Math.max(0, now.getMinutes() - i * 3)).padStart(2, '0');
+    const sysId = 'SYS-' + String(i + 1).padStart(2, '0');
+    lines.push('<div class="line" style="animation-delay:' + (i * 0.15) + 's">' +
+      '<span class="timestamp">' + h + ':' + m + '</span> ' +
+      '<span class="event">' + sysId + '</span> ' +
+      '<span class="value">' + r.loc.toLocaleString() + ' LOC</span></div>');
+  });
+  lines.push('<div class="line" style="animation-delay:' + (top.length * 0.15) + 's"><span class="timestamp">--:--</span> <span class="highlight">COMPOSITE: 101.1% FRONTIER+</span></div>');
+  feed.innerHTML = lines.join('');
+}
+
+// ===== HERO COUNTER =====
+function animateCounter(el) {
+  const target = parseFloat(el.dataset.target);
+  const duration = 2000;
+  const start = performance.now();
+  function tick(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.floor(eased * target).toLocaleString();
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+const heroLoc = document.getElementById('hero-loc');
+if (heroLoc) setTimeout(() => animateCounter(heroLoc), 500);
+
+// ===== INTERSECTION OBSERVERS =====
+// Systems bars
+const sysObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.system-bar-fill').forEach((bar, i) => {
+        setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, 50 + i * 30);
+      });
     }
   });
 }, { threshold: 0.1 });
+const sysEl = document.getElementById('systems');
+if (sysEl) sysObs.observe(sysEl);
 
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+// Wintermute
+const wmObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const bar = document.getElementById('wm-bar');
+      if (bar) setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, 200);
 
-// ===== BCI BAR ANIMATION =====
-const bciObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      document.querySelectorAll('.bci-bar-fill').forEach(bar => {
-        bar.style.width = bar.dataset.width + '%';
-      });
-    }
-  });
-}, { threshold: 0.3 });
-
-const bciSection = document.getElementById('bci');
-if (bciSection) bciObserver.observe(bciSection);
-
-// ===== COUNTER TRIGGER =====
-let countersTriggered = false;
-const counterObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting && !countersTriggered) {
-      countersTriggered = true;
-      animateCounters();
-    }
-  });
-}, { threshold: 0.3 });
-
-document.querySelectorAll('.metrics-bar').forEach(el => counterObserver.observe(el));
-
-// ===== BCI RADAR CHART =====
-const bciCtx = document.getElementById('bciChart');
-if (bciCtx) {
-  new Chart(bciCtx, {
-    type: 'radar',
-    data: {
-      labels: ['Throughput', 'Complexity', 'Breadth', 'Compression', 'Error Rate (inv)', 'Adaptation'],
-      datasets: [{
-        label: 'BCI Score',
-        data: [0.92, 0.85, 0.88, 0.94, 0.90, 0.87],
-        borderColor: '#00f0ff',
-        backgroundColor: 'rgba(0, 240, 255, 0.08)',
-        borderWidth: 2,
-        pointBackgroundColor: '#00f0ff',
-        pointBorderColor: '#00f0ff',
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      scales: {
-        r: {
-          beginAtZero: true,
-          max: 1,
-          ticks: {
-            stepSize: 0.2,
-            color: '#555577',
-            backdropColor: 'transparent',
-            font: { family: "'JetBrains Mono'", size: 9 }
-          },
-          grid: { color: 'rgba(26, 26, 62, 0.8)' },
-          angleLines: { color: 'rgba(26, 26, 62, 0.8)' },
-          pointLabels: {
-            color: '#8888aa',
-            font: { family: "'JetBrains Mono'", size: 10, weight: '600' }
-          }
-        }
-      },
-      plugins: {
-        legend: { display: false }
-      }
-    }
-  });
-}
-
-// ===== VELOCITY CHART =====
-const velCtx = document.getElementById('velocityChart');
-if (velCtx) {
-  const months = Array.from({length: 37}, (_, i) => i);
-  const earlyAdopter = months.map(m => Math.exp(0.12 * m));
-  const lateAdopter = months.map(m => m < 18 ? 0 : Math.exp(0.12 * (m - 18)));
-  const labels = months.map(m => m % 6 === 0 ? `M${m}` : '');
-
-  new Chart(velCtx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [
-        {
-          label: 'Early Adopter (BD)',
-          data: earlyAdopter,
-          borderColor: '#00f0ff',
-          backgroundColor: 'rgba(0, 240, 255, 0.05)',
-          fill: true,
-          tension: 0.4,
-          borderWidth: 2.5,
-          pointRadius: 0,
-          pointHoverRadius: 4,
-        },
-        {
-          label: 'Late Adopter',
-          data: lateAdopter,
-          borderColor: '#555577',
-          borderDash: [6, 4],
-          fill: false,
-          tension: 0.4,
-          borderWidth: 1.5,
-          pointRadius: 0,
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { intersect: false, mode: 'index' },
-      scales: {
-        x: {
-          grid: { color: 'rgba(26, 26, 62, 0.5)' },
-          ticks: {
-            color: '#555577',
-            font: { family: "'JetBrains Mono'", size: 10 },
-            maxRotation: 0
-          }
-        },
-        y: {
-          grid: { color: 'rgba(26, 26, 62, 0.5)' },
-          ticks: {
-            color: '#555577',
-            font: { family: "'JetBrains Mono'", size: 10 },
-            callback: v => v.toFixed(0) + 'x'
-          }
-        }
-      },
-      plugins: {
-        legend: {
-          labels: {
-            color: '#8888aa',
-            font: { family: "'JetBrains Mono'", size: 10 },
-            usePointStyle: true,
-            pointStyle: 'line'
-          }
-        },
-        tooltip: {
-          backgroundColor: 'rgba(15,15,26,0.9)',
-          titleFont: { family: "'JetBrains Mono'" },
-          bodyFont: { family: "'JetBrains Mono'" },
-          borderColor: '#1a1a3e',
-          borderWidth: 1
-        }
-      },
-      animations: {
-        tension: {
-          duration: 2000,
-          easing: 'easeOutQuart'
-        }
-      }
-    }
-  });
-
-  // Draw vertical "NOW" annotation
-  const velocityChart = Chart.getChart(velCtx);
-  if (velocityChart) {
-    const originalDraw = velocityChart.draw.bind(velocityChart);
-  }
-}
-
-// ===== SMOOTH NAV SCROLL =====
-document.querySelectorAll('.nav-links a').forEach(link => {
-  link.addEventListener('click', e => {
-    e.preventDefault();
-    const target = document.querySelector(link.getAttribute('href'));
-    if (target) target.scrollIntoView({ behavior: 'smooth' });
-    document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
-    link.classList.add('active');
-  });
-});
-
-// ===== SENTIENCE METER ANIMATION =====
-const sentienceObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      // Animate main bar
-      const bar = document.getElementById('sentience-bar');
-      if (bar) {
-        setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, 300);
-      }
-      // Animate score counter
-      const scoreEl = document.getElementById('sentience-score');
+      const scoreEl = document.getElementById('wm-score');
       if (scoreEl) {
         const target = 101.1;
-        const duration = 2000;
         const start = performance.now();
-        function updateScore(now) {
-          const elapsed = now - start;
-          const progress = Math.min(elapsed / duration, 1);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          const val = eased * target;
+        function tick(now) {
+          const p = Math.min((now - start) / 2000, 1);
+          const val = (1 - Math.pow(1 - p, 3)) * target;
           scoreEl.textContent = (val >= target - 0.1 ? target.toFixed(1) : Math.floor(val)) + '%';
-          if (progress < 1) requestAnimationFrame(updateScore);
+          if (p < 1) requestAnimationFrame(tick);
         }
-        setTimeout(() => requestAnimationFrame(updateScore), 300);
+        setTimeout(() => requestAnimationFrame(tick), 200);
       }
-      // Animate category bars
-      document.querySelectorAll('.bench-cat-fill').forEach((fill, i) => {
-        setTimeout(() => {
-          fill.style.width = fill.dataset.width + '%';
-        }, 500 + i * 100);
+
+      document.querySelectorAll('.bench-fill').forEach((fill, i) => {
+        setTimeout(() => { fill.style.width = fill.dataset.width + '%'; }, 300 + i * 80);
       });
     }
   });
-}, { threshold: 0.2 });
+}, { threshold: 0.1 });
+const wmEl = document.getElementById('wintermute');
+if (wmEl) wmObs.observe(wmEl);
 
-const wmSection = document.getElementById('wintermute');
-if (wmSection) sentienceObserver.observe(wmSection);
-
-// ===== ACTIVE NAV ON SCROLL =====
-const sections = document.querySelectorAll('section[id]');
-window.addEventListener('scroll', () => {
-  let current = '';
-  sections.forEach(section => {
-    const top = section.offsetTop - 100;
-    if (window.scrollY >= top) current = section.getAttribute('id');
+// Velocity gauge
+const velObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const arc = document.getElementById('gauge-arc');
+      if (arc) setTimeout(() => arc.classList.add('animated'), 300);
+    }
   });
-  document.querySelectorAll('.nav-links a').forEach(link => {
-    link.classList.remove('active');
-    if (link.getAttribute('href') === '#' + current) link.classList.add('active');
+}, { threshold: 0.3 });
+const velEl = document.getElementById('velocity-panel');
+if (velEl) velObs.observe(velEl);
+
+// Active nav
+const sections = document.querySelectorAll('[id]');
+document.querySelectorAll('.topbar-nav a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const t = document.querySelector(link.getAttribute('href'));
+    if (t) t.scrollIntoView({ behavior: 'smooth' });
   });
 });
+
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (s.offsetTop - 100 <= window.scrollY) current = s.id;
+  });
+  document.querySelectorAll('.topbar-nav a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+});
+
+document.getElementById('footer-year').textContent = new Date().getFullYear();
 </script>
 </body>
 </html>
