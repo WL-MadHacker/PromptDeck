@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>BRENDEN DEARIE // Command Interface</title>
 <meta name="description" content="AI-Native Developer — 1.15M+ LOC, 35 repos, solo operator. See the signal.">
 <meta property="og:title" content="Brenden Dearie — AI-Native Developer">
@@ -526,7 +529,7 @@ body::after {
 
 .rarity-score .pri-value {
   font-family: var(--font-mono);
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--ice-bright);
   letter-spacing: 1px;
@@ -1532,7 +1535,7 @@ body::after {
           <!-- Score readout -->
           <div class="rarity-score">
             <div class="pri-value" id="pri-display">1 in —</div>
-            <div class="pri-target">TARGET: 1 in 1B &bull; ETA ~14mo</div>
+            <div class="pri-target">TRAJECTORY: 1 in 1B &bull; ETA ~14mo</div>
           </div>
 
           <!-- Escape Velocity badge -->
@@ -1739,10 +1742,12 @@ fetchLiveMetrics();
 
 // ===== RARITY ENGINE =====
 function populateRarity(r) {
-  // Compute PRI from dimensions
+  // Compute PRI range from dimensions
   const product = r.dimensions.reduce((acc, d) => acc * d.p, 1);
-  const adjustedP = product * r.correlationFactor;
-  const pri = Math.round(1 / (adjustedP * r.referencePopulation));
+  const priConservative = Math.round(1 / (product * r.correlationFactorConservative * r.referencePopulation));
+  const priModerate = Math.round(1 / (product * r.correlationFactorModerate * r.referencePopulation));
+  // Geometric mean for needle position
+  const pri = Math.round(Math.sqrt(priConservative * priModerate));
 
   // Format PRI
   function formatPRI(n) {
@@ -1752,16 +1757,16 @@ function populateRarity(r) {
     return n.toString();
   }
 
-  // Animate PRI display
+  // Animate PRI range display
   const priEl = document.getElementById('pri-display');
   if (priEl) {
     const start = performance.now();
-    const target = pri;
     function tickPRI(now) {
       const p = Math.min((now - start) / 2500, 1);
       const eased = 1 - Math.pow(1 - p, 3);
-      const val = Math.floor(eased * target);
-      priEl.textContent = '1 in ' + formatPRI(Math.max(val, 1));
+      const lo = Math.floor(eased * priConservative);
+      const hi = Math.floor(eased * priModerate);
+      priEl.textContent = '1 in ' + formatPRI(Math.max(lo, 1)) + ' — ' + formatPRI(Math.max(hi, 1));
       if (p < 1) requestAnimationFrame(tickPRI);
     }
     requestAnimationFrame(tickPRI);

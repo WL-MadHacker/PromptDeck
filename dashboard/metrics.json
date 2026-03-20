@@ -48,7 +48,8 @@
   ],
   "rarity": {
     "referencePopulation": 28700000,
-    "correlationFactor": 500000000,
+    "correlationFactorConservative": 1400000000000,
+    "correlationFactorModerate": 77000000000,
     "targetPRI": 1000000000,
     "escapeVelocityPct": 72,
     "dimensions": [
