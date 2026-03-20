@@ -16,25 +16,25 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg: #080a0e;
-  --bg-panel: rgba(8, 12, 18, 0.55);
-  --bg-panel-solid: rgba(8, 12, 18, 0.6);
-  --border: rgba(126, 184, 201, 0.12);
-  --border-bright: rgba(126, 184, 201, 0.3);
-  --ice: #7eb8c9;
-  --ice-dim: #4a7a8a;
-  --ice-glow: rgba(126, 184, 201, 0.2);
-  --ice-bright: #a8dae8;
-  --gold: #d4a853;
-  --gold-dim: rgba(212, 168, 83, 0.15);
-  --green: #4ade80;
-  --green-dim: rgba(74, 222, 128, 0.15);
-  --red: #f87171;
-  --red-dim: rgba(248, 113, 113, 0.15);
-  --amber: #fbbf24;
-  --text: #d4e0e8;
-  --text-mid: #7a8a94;
-  --text-dim: #3a4a54;
+  --bg: #f4f5f7;
+  --bg-panel: rgba(255, 255, 255, 0.65);
+  --bg-panel-solid: rgba(255, 255, 255, 0.8);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-bright: rgba(0, 0, 0, 0.18);
+  --ice: #2a6f8a;
+  --ice-dim: #5a9ab0;
+  --ice-glow: rgba(42, 111, 138, 0.12);
+  --ice-bright: #1a5a72;
+  --gold: #b08630;
+  --gold-dim: rgba(176, 134, 48, 0.1);
+  --green: #22a55a;
+  --green-dim: rgba(34, 165, 90, 0.1);
+  --red: #dc4848;
+  --red-dim: rgba(220, 72, 72, 0.1);
+  --amber: #d49b1a;
+  --text: #1a1e24;
+  --text-mid: #5a6470;
+  --text-dim: #8a94a0;
   --font-display: 'Oxanium', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
   --font-body: 'Space Grotesk', sans-serif;
@@ -42,8 +42,8 @@
     0deg,
     transparent,
     transparent 2px,
-    rgba(126, 184, 201, 0.015) 2px,
-    rgba(126, 184, 201, 0.015) 4px
+    rgba(0, 0, 0, 0.008) 2px,
+    rgba(0, 0, 0, 0.008) 4px
   );
 }
 
@@ -65,7 +65,7 @@ body::before {
   z-index: 9999;
   pointer-events: none;
   background: var(--scanline);
-  opacity: 0.5;
+  opacity: 0.3;
 }
 
 /* Three.js canvas */
@@ -83,7 +83,7 @@ body::after {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(8, 10, 14, 0.5) 100%);
+  background: radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(244, 245, 247, 0.6) 100%);
 }
 
 /* ===== TOPBAR ===== */
@@ -92,7 +92,7 @@ body::after {
   top: 0; left: 0; right: 0;
   z-index: 100;
   height: 40px;
-  background: rgba(8, 10, 14, 0.7);
+  background: rgba(255, 255, 255, 0.75);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -311,7 +311,7 @@ body::after {
   justify-content: space-between;
   align-items: center;
   padding: 0.3rem 0;
-  border-bottom: 1px solid rgba(126, 184, 201, 0.04);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 .metric-row:last-child { border-bottom: none; }
@@ -365,7 +365,7 @@ body::after {
   stroke-dasharray: 251;
   stroke-dashoffset: 251;
   transition: stroke-dashoffset 2.5s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: drop-shadow(0 0 6px rgba(126, 184, 201, 0.4));
+  filter: drop-shadow(0 0 6px rgba(42, 111, 138, 0.3));
 }
 
 .gauge-fill.animated {
@@ -385,7 +385,7 @@ body::after {
   color: var(--ice);
   text-align: center;
   margin-top: -0.25rem;
-  text-shadow: 0 0 20px rgba(126, 184, 201, 0.3);
+  text-shadow: 0 0 20px rgba(42, 111, 138, 0.2);
 }
 
 .gauge-label {
@@ -424,7 +424,7 @@ body::after {
   justify-content: space-between;
   align-items: center;
   padding: 0.25rem 0.4rem;
-  background: rgba(126, 184, 201, 0.03);
+  background: rgba(0, 0, 0, 0.03);
   border: 1px solid var(--border);
   border-radius: 3px;
 }
@@ -492,7 +492,7 @@ body::after {
   stroke-dasharray: 220;
   stroke-dashoffset: 220;
   transition: stroke-dashoffset 2.5s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: drop-shadow(0 0 6px rgba(126, 184, 201, 0.5));
+  filter: drop-shadow(0 0 6px rgba(42, 111, 138, 0.3));
 }
 
 .gauge-fill.animated {
@@ -501,7 +501,7 @@ body::after {
 
 .gauge-needle {
   fill: var(--ice);
-  filter: drop-shadow(0 0 8px rgba(126, 184, 201, 0.8));
+  filter: drop-shadow(0 0 8px rgba(42, 111, 138, 0.4));
   transform-origin: 120px 85px;
   transition: transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -520,7 +520,7 @@ body::after {
   stroke-width: 5;
   stroke-linecap: round;
   opacity: 0.15;
-  filter: drop-shadow(0 0 4px rgba(212, 168, 83, 0.3));
+  filter: drop-shadow(0 0 4px rgba(176, 134, 48, 0.2));
 }
 
 .rarity-score {
@@ -553,7 +553,7 @@ body::after {
   padding: 4px 10px;
   border-radius: 2px;
   border: 1px solid var(--border-bright);
-  background: rgba(126, 184, 201, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   margin-top: 6px;
 }
 
@@ -758,7 +758,7 @@ body::after {
 
 .system-card:hover {
   border-color: var(--border-bright);
-  box-shadow: 0 0 16px rgba(126, 184, 201, 0.05);
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.04);
 }
 
 .system-card .name {
@@ -781,7 +781,7 @@ body::after {
 
 .system-bar {
   height: 3px;
-  background: rgba(126, 184, 201, 0.08);
+  background: rgba(0, 0, 0, 0.05);
   border-radius: 2px;
   overflow: hidden;
   margin-bottom: 0.3rem;
@@ -836,7 +836,7 @@ body::after {
 
 .wm-bar-outer {
   height: 8px;
-  background: rgba(126, 184, 201, 0.06);
+  background: rgba(0, 0, 0, 0.04);
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 0.5rem;
@@ -884,7 +884,7 @@ body::after {
 
 .bench-item .bench-bar {
   height: 3px;
-  background: rgba(126, 184, 201, 0.06);
+  background: rgba(0, 0, 0, 0.04);
   border-radius: 2px;
   position: relative;
 }
@@ -929,7 +929,7 @@ body::after {
 .frontier-compact td {
   padding: 0.35rem 0.3rem;
   text-align: center;
-  border-bottom: 1px solid rgba(126, 184, 201, 0.03);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
   color: var(--text-dim);
   font-size: 0.55rem;
 }
@@ -1024,7 +1024,7 @@ body::after {
 
 .cta-btn:hover {
   background: var(--ice);
-  color: var(--bg);
+  color: #fff;
   box-shadow: 0 0 20px var(--ice-glow);
 }
 
@@ -1034,7 +1034,7 @@ body::after {
   bottom: 0; left: 0; right: 0;
   z-index: 100;
   height: 24px;
-  background: rgba(8, 10, 14, 0.7);
+  background: rgba(255, 255, 255, 0.75);
   border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -1096,25 +1096,25 @@ body::after {
 </head>
 <body>
 <canvas id="three-bg"></canvas>
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js" integrity="sha384-qOkzR5Ke/XkQxuGVJ9hpFEpDlcoLtWwVYhnJf06cLIZa2vaIptSqaubivErzmD5O" crossorigin="anonymous"></script>
 <script>
 (function() {
   const canvas = document.getElementById('three-bg');
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0x000000, 0);
+  renderer.setClearColor(0xf4f5f7, 0);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.2;
+  renderer.toneMappingExposure = 1.0;
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x080a0e, 0.012);
+  scene.fog = new THREE.FogExp2(0xf4f5f7, 0.015);
   const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.set(0, 2, 35);
 
-  const ICE = 0x7eb8c9;
-  const ICE_DIM = 0x3a6070;
-  const GOLD = 0xd4a853;
+  const ICE = 0x2a6f8a;
+  const ICE_DIM = 0x5a9ab0;
+  const GOLD = 0xb08630;
 
   // === CENTRAL SPHERE — Glowing core ===
   const coreGeo = new THREE.SphereGeometry(1.8, 32, 32);
@@ -1127,14 +1127,14 @@ body::after {
   glowCanvas.width = 256; glowCanvas.height = 256;
   const gCtx = glowCanvas.getContext('2d');
   const grad = gCtx.createRadialGradient(128, 128, 0, 128, 128, 128);
-  grad.addColorStop(0, 'rgba(126, 184, 201, 0.6)');
-  grad.addColorStop(0.3, 'rgba(126, 184, 201, 0.15)');
-  grad.addColorStop(0.7, 'rgba(126, 184, 201, 0.03)');
-  grad.addColorStop(1, 'rgba(126, 184, 201, 0)');
+  grad.addColorStop(0, 'rgba(42, 111, 138, 0.35)');
+  grad.addColorStop(0.3, 'rgba(42, 111, 138, 0.08)');
+  grad.addColorStop(0.7, 'rgba(42, 111, 138, 0.02)');
+  grad.addColorStop(1, 'rgba(42, 111, 138, 0)');
   gCtx.fillStyle = grad;
   gCtx.fillRect(0, 0, 256, 256);
   const glowTex = new THREE.CanvasTexture(glowCanvas);
-  const glowSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, transparent: true, blending: THREE.AdditiveBlending }));
+  const glowSprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, transparent: true, blending: THREE.NormalBlending }));
   glowSprite.scale.set(18, 18, 1);
   scene.add(glowSprite);
 
@@ -1161,7 +1161,7 @@ body::after {
   function makeRing(r, w, color, opacity) {
     const m = new THREE.Mesh(
       new THREE.TorusGeometry(r, w, 16, 200),
-      new THREE.MeshBasicMaterial({ color, transparent: true, opacity, blending: THREE.AdditiveBlending })
+      new THREE.MeshBasicMaterial({ color, transparent: true, opacity, blending: THREE.NormalBlending })
     );
     scene.add(m);
     return m;
@@ -1218,7 +1218,7 @@ body::after {
       }
     `,
     transparent: true,
-    blending: THREE.AdditiveBlending,
+    blending: THREE.NormalBlending,
     depthWrite: false,
   });
   const particles = new THREE.Points(pGeo, pMat);
@@ -1231,7 +1231,7 @@ body::after {
   const lGeo = new THREE.BufferGeometry();
   lGeo.setAttribute('position', new THREE.BufferAttribute(lPos, 3));
   lGeo.setDrawRange(0, 0);
-  const lMat = new THREE.LineBasicMaterial({ color: ICE_DIM, transparent: true, opacity: 0.06, blending: THREE.AdditiveBlending });
+  const lMat = new THREE.LineBasicMaterial({ color: ICE_DIM, transparent: true, opacity: 0.06, blending: THREE.NormalBlending });
   const lines = new THREE.LineSegments(lGeo, lMat);
   scene.add(lines);
 
@@ -1245,15 +1245,15 @@ body::after {
     const tilt = (Math.random() - 0.5) * Math.PI * 0.6;
     const dot = new THREE.Mesh(
       new THREE.SphereGeometry(0.06 + Math.random() * 0.06, 8, 8),
-      new THREE.MeshBasicMaterial({ color: i < 4 ? GOLD : ICE, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending })
+      new THREE.MeshBasicMaterial({ color: i < 4 ? GOLD : ICE, transparent: true, opacity: 0.6, blending: THREE.NormalBlending })
     );
     scene.add(dot);
     orbiters.push({ mesh: dot, r, speed, phase, tilt });
   }
 
   // === AMBIENT LIGHT for depth ===
-  scene.add(new THREE.AmbientLight(0x7eb8c9, 0.1));
-  const pointLight = new THREE.PointLight(0x7eb8c9, 2, 30);
+  scene.add(new THREE.AmbientLight(0x2a6f8a, 0.15));
+  const pointLight = new THREE.PointLight(0x2a6f8a, 1.5, 30);
   pointLight.position.set(0, 0, 0);
   scene.add(pointLight);
 
@@ -1431,8 +1431,8 @@ body::after {
           <span class="value green" id="m-features">750+</span>
         </div>
         <div class="metric-row">
-          <span class="label">Equiv Value</span>
-          <span class="value gold" id="m-value">$17.3M/yr</span>
+          <span class="label">Output Value</span>
+          <span class="value gold" id="m-value" title="ISBSG industry valuation at $15/LOC">$17.3M est.</span>
         </div>
         <div class="metric-row">
           <span class="label">Completion</span>
@@ -1448,9 +1448,9 @@ body::after {
           <svg viewBox="0 0 120 70">
             <defs>
               <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#3a6070"/>
-                <stop offset="50%" stop-color="#7eb8c9"/>
-                <stop offset="100%" stop-color="#d4a853"/>
+                <stop offset="0%" stop-color="#5a9ab0"/>
+                <stop offset="50%" stop-color="#2a6f8a"/>
+                <stop offset="100%" stop-color="#b08630"/>
               </linearGradient>
             </defs>
             <!-- Track -->
@@ -1468,7 +1468,7 @@ body::after {
               <line x1="110" y1="65" x2="106" y2="62" />
             </g>
             <!-- Needle dot -->
-            <circle cx="100" cy="35" r="3" fill="#d4a853" opacity="0.8" id="gauge-dot">
+            <circle cx="100" cy="35" r="3" fill="#b08630" opacity="0.8" id="gauge-dot">
               <animate attributeName="opacity" values="0.8;0.4;0.8" dur="3s" repeatCount="indefinite"/>
             </circle>
           </svg>
@@ -1494,9 +1494,9 @@ body::after {
           <svg class="rarity-gauge-svg" viewBox="0 0 240 130" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="rarity-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="#3a6070"/>
-                <stop offset="50%" stop-color="#7eb8c9"/>
-                <stop offset="100%" stop-color="#d4a853"/>
+                <stop offset="0%" stop-color="#5a9ab0"/>
+                <stop offset="50%" stop-color="#2a6f8a"/>
+                <stop offset="100%" stop-color="#b08630"/>
               </linearGradient>
             </defs>
             <!-- Track -->
@@ -1511,23 +1511,23 @@ body::after {
             <text class="gauge-tick-label" x="80" y="35">1M</text>
             <text class="gauge-tick-label" x="135" y="28">10M</text>
             <text class="gauge-tick-label" x="180" y="42">100M</text>
-            <text class="gauge-tick-label" x="202" y="75" fill="#d4a853">1B</text>
+            <text class="gauge-tick-label" x="202" y="75" fill="#b08630">1B</text>
             <text class="gauge-tick-label" x="210" y="118">10B</text>
             <!-- Minor ticks on arc -->
-            <circle cx="25" cy="105" r="1.5" fill="#3a4a54"/>
-            <circle cx="42" cy="72" r="1.5" fill="#3a4a54"/>
-            <circle cx="76" cy="32" r="1.5" fill="#3a4a54"/>
-            <circle cx="120" cy="20" r="1.5" fill="#3a4a54"/>
-            <circle cx="164" cy="32" r="1.5" fill="#3a4a54"/>
-            <circle cx="198" cy="72" r="1.5" fill="#d4a853" opacity="0.5"/>
-            <circle cx="215" cy="105" r="1.5" fill="#3a4a54"/>
+            <circle cx="25" cy="105" r="1.5" fill="#8a94a0"/>
+            <circle cx="42" cy="72" r="1.5" fill="#8a94a0"/>
+            <circle cx="76" cy="32" r="1.5" fill="#8a94a0"/>
+            <circle cx="120" cy="20" r="1.5" fill="#8a94a0"/>
+            <circle cx="164" cy="32" r="1.5" fill="#8a94a0"/>
+            <circle cx="198" cy="72" r="1.5" fill="#b08630" opacity="0.5"/>
+            <circle cx="215" cy="105" r="1.5" fill="#8a94a0"/>
             <!-- Needle glow -->
             <polygon class="gauge-needle-glow" id="rarity-needle-glow" points="120,85 117,88 88,43 92,41"/>
             <!-- Needle -->
             <polygon class="gauge-needle" id="rarity-needle" points="120,85 118,87 90,44 92,42"/>
             <!-- Center hub -->
-            <circle cx="120" cy="85" r="5" fill="#080a0e" stroke="#7eb8c9" stroke-width="1.5"/>
-            <circle cx="120" cy="85" r="2" fill="#7eb8c9" opacity="0.6">
+            <circle cx="120" cy="85" r="5" fill="#f4f5f7" stroke="#2a6f8a" stroke-width="1.5"/>
+            <circle cx="120" cy="85" r="2" fill="#2a6f8a" opacity="0.6">
               <animate attributeName="opacity" values="0.4;0.8;0.4" dur="2s" repeatCount="indefinite"/>
             </circle>
           </svg>
@@ -1576,16 +1576,17 @@ body::after {
       <div class="wm-header">
         <div class="title">Wintermute // Sentience Index</div>
         <div class="score" id="wm-score">0%</div>
+        <div style="font-family:var(--font-mono);font-size:0.5rem;color:var(--text-dim);margin-top:-2px;text-align:right;">avg frontier ratio across 6 benchmarks</div>
       </div>
       <div class="wm-body">
         <div class="wm-bar-outer">
-          <div class="wm-bar-fill" id="wm-bar" data-width="101"></div>
+          <div class="wm-bar-fill" id="wm-bar" data-width="107"></div>
         </div>
         <div class="wm-labels">
           <span>DORMANT</span>
           <span>AWAKENING</span>
           <span>COGNITIVE</span>
-          <span>FRONTIER</span>
+          <span>FRONTIER+</span>
         </div>
 
         <div class="bench-grid" id="bench-grid">
@@ -1704,7 +1705,7 @@ async function fetchLiveMetrics() {
     document.getElementById('m-repos').textContent = data.totals.repos;
     document.getElementById('m-commits').textContent = data.totals.commits.toLocaleString();
     document.getElementById('m-features').textContent = data.totals.features + '+';
-    document.getElementById('m-value').textContent = '$' + data.totals.equivValueM + 'M/yr';
+    document.getElementById('m-value').textContent = '$' + data.totals.equivValueM + 'M est.';
     document.getElementById('hero-loc').dataset.target = data.totals.loc;
     document.getElementById('sys-count').textContent = data.totals.repos + ' repos';
     document.getElementById('status-repos').textContent = data.totals.repos + ' repos';
@@ -1839,7 +1840,7 @@ function generateFeed(data) {
       '<span class="event">' + sysId + '</span> ' +
       '<span class="value">' + r.loc.toLocaleString() + ' LOC</span></div>');
   });
-  lines.push('<div class="line" style="animation-delay:' + (top.length * 0.15) + 's"><span class="timestamp">--:--</span> <span class="highlight">COMPOSITE: 101.1% FRONTIER+</span></div>');
+  lines.push('<div class="line" style="animation-delay:' + (top.length * 0.15) + 's"><span class="timestamp">--:--</span> <span class="highlight">COMPOSITE: 107.3% FRONTIER+</span></div>');
   feed.innerHTML = lines.join('');
 }
 
@@ -1882,7 +1883,7 @@ const wmObs = new IntersectionObserver((entries) => {
 
       const scoreEl = document.getElementById('wm-score');
       if (scoreEl) {
-        const target = 101.1;
+        const target = 107.3;
         const start = performance.now();
         function tick(now) {
           const p = Math.min((now - start) / 2000, 1);
