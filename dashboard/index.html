@@ -1774,7 +1774,7 @@ body::after {
         </div>
         <div class="metric-row">
           <span class="label">Commits</span>
-          <span class="value" id="m-commits">15,800</span>
+          <span class="value" id="m-commits">15,804</span>
         </div>
         <div class="metric-row">
           <span class="label">Features</span>
@@ -1927,7 +1927,7 @@ body::after {
           <!-- Score readout -->
           <div class="rarity-score">
             <div class="pri-value" id="pri-display">1 in —</div>
-            <div class="pri-target">TRAJECTORY: 1 in 1B &bull; ETA ~14mo</div>
+            <div class="pri-target" id="pri-trajectory">TRAJECTORY: 1 in 1B &bull; ETA ~11mo</div>
           </div>
 
           <!-- Escape Velocity badge -->
@@ -2192,6 +2192,12 @@ function populateRarity(r) {
       if (p < 1) requestAnimationFrame(tickPRI);
     }
     requestAnimationFrame(tickPRI);
+  }
+
+  // Trajectory
+  const trajEl = document.getElementById('pri-trajectory');
+  if (trajEl && r.trajectory) {
+    trajEl.innerHTML = 'TRAJECTORY: 1 in 1B &bull; ETA ~' + r.trajectory.projectedMonthsTo1B + 'mo';
   }
 
   // EVI
