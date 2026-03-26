@@ -1090,6 +1090,281 @@ body::after {
   .systems-grid { grid-template-columns: 1fr; }
   .status-bar .right { display: none; }
 }
+
+/* ===== UPGRADE 1: STAGGERED ENTRANCE ANIMATIONS ===== */
+@keyframes panelEnter {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel, .wintermute-section, .system-card {
+  opacity: 0;
+  animation: panelEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.sidebar-left .panel:nth-child(1) { animation-delay: 0.1s; }
+.sidebar-left .panel:nth-child(2) { animation-delay: 0.25s; }
+.sidebar-left .panel:nth-child(3) { animation-delay: 0.4s; }
+.sidebar-right .panel:nth-child(1) { animation-delay: 0.15s; }
+.sidebar-right .panel:nth-child(2) { animation-delay: 0.3s; }
+.sidebar-right .panel:nth-child(3) { animation-delay: 0.45s; }
+.sidebar-right .panel:nth-child(4) { animation-delay: 0.6s; }
+.wintermute-section { animation-delay: 0.5s; }
+.system-card:nth-child(1) { animation-delay: 0.1s; }
+.system-card:nth-child(2) { animation-delay: 0.15s; }
+.system-card:nth-child(3) { animation-delay: 0.2s; }
+.system-card:nth-child(4) { animation-delay: 0.25s; }
+.system-card:nth-child(5) { animation-delay: 0.3s; }
+.system-card:nth-child(6) { animation-delay: 0.35s; }
+.system-card:nth-child(7) { animation-delay: 0.4s; }
+.system-card:nth-child(8) { animation-delay: 0.45s; }
+.system-card:nth-child(9) { animation-delay: 0.5s; }
+.system-card:nth-child(10) { animation-delay: 0.55s; }
+.system-card:nth-child(11) { animation-delay: 0.6s; }
+.system-card:nth-child(12) { animation-delay: 0.65s; }
+
+.command-hero {
+  opacity: 0;
+  animation: panelEnter 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.05s forwards;
+}
+
+/* ===== UPGRADE 2: HOLOGRAPHIC PANEL BORDERS ===== */
+@keyframes holoBorder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.panel.holo-border,
+#velocity-panel,
+#signal,
+.rarity-gauge-wrap {
+  position: relative;
+  border: none;
+}
+
+.panel.holo-border::before,
+#velocity-panel::before,
+#signal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  padding: 1px;
+  background: linear-gradient(90deg,
+    rgba(42, 111, 138, 0.15),
+    rgba(255, 255, 255, 0.4),
+    rgba(176, 134, 48, 0.2),
+    rgba(255, 255, 255, 0.4),
+    rgba(42, 111, 138, 0.15)
+  );
+  background-size: 300% 100%;
+  animation: holoBorder 6s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ===== UPGRADE 3: LIVE DATA PULSE ===== */
+@keyframes metricFlash {
+  0% { text-shadow: none; }
+  20% { text-shadow: 0 0 8px rgba(34, 165, 90, 0.6); }
+  100% { text-shadow: none; }
+}
+
+@keyframes heartbeat {
+  0%, 100% { text-shadow: none; }
+  50% { text-shadow: 0 0 12px rgba(42, 111, 138, 0.25); }
+}
+
+.metric-flash {
+  animation: metricFlash 0.8s ease-out;
+}
+
+.metric-heartbeat {
+  animation: heartbeat 4s ease-in-out infinite;
+}
+
+/* ===== UPGRADE 4: CHROMATIC ABERRATION HEADING ===== */
+.command-id .callsign {
+  position: relative;
+}
+
+.command-id .callsign::before,
+.command-id .callsign::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.command-id .callsign::before {
+  color: rgba(220, 72, 72, 0.12);
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+  transform: translate(-1.5px, -0.5px);
+  animation: chromaShift 8s ease-in-out infinite alternate;
+}
+
+.command-id .callsign::after {
+  color: rgba(42, 111, 138, 0.12);
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+  transform: translate(1.5px, 0.5px);
+  animation: chromaShift 8s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes chromaShift {
+  0% { transform: translate(-1.5px, -0.5px); }
+  25% { transform: translate(0.5px, 0.3px); }
+  50% { transform: translate(-0.8px, 0.2px); }
+  75% { transform: translate(1px, -0.3px); }
+  100% { transform: translate(-1.2px, 0.5px); }
+}
+
+/* ===== UPGRADE 5: HERO PARTICLE BURST ===== */
+.hero-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--ice);
+  pointer-events: none;
+  opacity: 0;
+}
+
+@keyframes particleBurst {
+  0% { transform: translate(0, 0) scale(1); opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+.command-stats {
+  position: relative;
+  overflow: visible;
+}
+
+/* ===== UPGRADE 6: SCAN LINE SWEEP ON HERO ===== */
+@keyframes scanSweep {
+  0% { left: -10%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { left: 110%; opacity: 0; }
+}
+
+.primary-metric {
+  position: relative;
+  overflow: hidden;
+}
+
+.primary-metric::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -10%;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(180deg, transparent, var(--ice), transparent);
+  opacity: 0;
+  animation: scanSweep 3s ease-in-out 2.5s 1 forwards;
+  pointer-events: none;
+}
+
+/* ===== UPGRADE 7: GAUGE NEEDLE TRAIL ===== */
+.gauge-needle-trail {
+  transform-origin: 120px 115px;
+  transition: transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.15;
+  filter: blur(3px);
+}
+
+/* ===== UPGRADE 8: TERMINAL BOOT SEQUENCE ===== */
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.status-bar .boot-cursor {
+  display: inline-block;
+  width: 5px;
+  height: 8px;
+  background: var(--ice);
+  margin-left: 2px;
+  animation: cursorBlink 0.6s step-end infinite;
+  vertical-align: middle;
+}
+
+/* ===== UPGRADE 9: SPARKLINES IN SYSTEM CARDS ===== */
+.system-card .sparkline {
+  display: block;
+  width: 100%;
+  height: 16px;
+  margin: 4px 0 2px;
+}
+
+.system-card .sparkline polyline {
+  fill: none;
+  stroke: var(--ice-dim);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.system-card .sparkline .spark-area {
+  fill: var(--ice-glow);
+  stroke: none;
+}
+
+/* ===== UPGRADE 10: NEURAL NET VIZ ===== */
+.neural-net-container {
+  position: relative;
+  width: 100%;
+  height: 80px;
+  margin: 0.75rem 0 0;
+  overflow: hidden;
+}
+
+.neural-net-container canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== UPGRADE 11: AMBIENT SOUND TOGGLE ===== */
+.sound-toggle {
+  position: fixed;
+  bottom: 32px;
+  right: 12px;
+  z-index: 200;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-bright);
+  background: var(--bg-panel);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  transition: all 0.3s;
+  opacity: 0.6;
+}
+
+.sound-toggle:hover {
+  opacity: 1;
+  border-color: var(--ice-dim);
+  color: var(--ice);
+}
+
+.sound-toggle.active {
+  opacity: 1;
+  color: var(--ice);
+  border-color: var(--ice);
+  box-shadow: 0 0 8px var(--ice-glow);
+}
 </style>
 </head>
 <body>
@@ -1258,6 +1533,27 @@ body::after {
   const lines = new THREE.LineSegments(lGeo, lMat);
   scene.add(lines);
 
+  // === DATA STREAMS — faint vertical falling characters ===
+  const STREAM_COUNT = 8;
+  const STREAM_DOTS = 20;
+  const streams = [];
+  for (let s = 0; s < STREAM_COUNT; s++) {
+    const x = (Math.random() - 0.5) * 50;
+    const z = (Math.random() - 0.5) * 20 - 5;
+    const speed = 0.02 + Math.random() * 0.03;
+    const dots = [];
+    for (let d = 0; d < STREAM_DOTS; d++) {
+      const dot = new THREE.Mesh(
+        new THREE.PlaneGeometry(0.15, 0.15),
+        new THREE.MeshBasicMaterial({ color: ICE, transparent: true, opacity: 0.04 * (1 - d / STREAM_DOTS), blending: THREE.NormalBlending, depthWrite: false })
+      );
+      dot.position.set(x, 25 - d * 1.2, z);
+      scene.add(dot);
+      dots.push(dot);
+    }
+    streams.push({ dots, speed, baseY: 25 });
+  }
+
   // === FLOATING DATA POINTS — small bright dots orbiting ===
   const orbiterCount = 36;
   const orbiters = [];
@@ -1390,6 +1686,14 @@ body::after {
       );
     });
 
+    // Data streams — falling dots
+    streams.forEach(s => {
+      s.dots.forEach((dot, i) => {
+        dot.position.y -= s.speed;
+        if (dot.position.y < -25) dot.position.y = s.baseY - i * 1.2;
+      });
+    });
+
     renderer.render(scene, camera);
   }
   animate();
@@ -1425,7 +1729,7 @@ body::after {
 <!-- COMMAND HERO -->
 <div class="command-hero" id="hero">
   <div class="command-id">
-    <div class="callsign">BRENDEN <span>DEARIE</span></div>
+    <div class="callsign" data-text="BRENDEN DEARIE">BRENDEN <span>DEARIE</span></div>
     <div class="designation">AI-Native Developer &bull; Founder, WayLucid &bull; Phoenix, AZ &bull; Solo Operator</div>
   </div>
   <div class="command-stats">
@@ -1588,6 +1892,8 @@ body::after {
             <text class="gauge-tick-label" x="166" y="28" font-size="6.5">100M</text>
             <text class="gauge-tick-label" x="202" y="62" fill="#b08630" font-size="7" font-weight="600">1B</text>
             <text class="gauge-tick-label" x="212" y="128" font-size="6.5">10B</text>
+            <!-- Needle trail (afterimage) -->
+            <line class="gauge-needle-trail" id="rarity-needle-trail" x1="120" y1="115" x2="120" y2="30" stroke="#2a6f8a" stroke-width="4" stroke-linecap="round" style="transform-origin:120px 115px;transition:transform 2s cubic-bezier(0.16,1,0.3,1);"/>
             <!-- Needle glow -->
             <line class="gauge-needle-glow" id="rarity-needle-glow" x1="120" y1="115" x2="120" y2="30" stroke="#2a6f8a" stroke-width="3" stroke-linecap="round" opacity="0.3" filter="url(#needleGlow)" style="transform-origin:120px 115px;transition:transform 2.5s cubic-bezier(0.16,1,0.3,1);"/>
             <!-- Needle -->
@@ -1681,6 +1987,10 @@ body::after {
             <tr class="wm-row"><td>Wintermute</td><td>91.3</td><td>92.5</td><td>95.0</td><td>92.9</td><td>93.3</td><td>81.3</td></tr>
           </tbody>
         </table>
+        <!-- Neural Network Visualization -->
+        <div class="neural-net-container">
+          <canvas id="neural-net-canvas"></canvas>
+        </div>
       </div>
     </div>
 
@@ -1780,12 +2090,14 @@ async function fetchLiveMetrics() {
     document.getElementById('m-value').textContent = '$' + data.totals.equivValueM + 'M est.';
     document.getElementById('hero-loc').dataset.target = data.totals.loc;
     document.getElementById('sys-count').textContent = data.totals.repos + ' repos';
-    document.getElementById('status-repos').textContent = data.totals.repos + ' repos';
+    const statusRepos = document.getElementById('status-repos');
+    if (statusRepos) statusRepos.textContent = data.totals.repos + ' repos';
 
     // Age badge
     if (data.generated) {
       const hours = Math.floor((Date.now() - new Date(data.generated).getTime()) / 3600000);
-      document.getElementById('status-age').textContent = 'updated ' + (hours < 24 ? hours + 'h ago' : Math.floor(hours / 24) + 'd ago');
+      const statusAge = document.getElementById('status-age');
+      if (statusAge) statusAge.textContent = 'updated ' + (hours < 24 ? hours + 'h ago' : Math.floor(hours / 24) + 'd ago');
     }
 
     // Systems grid
@@ -1884,6 +2196,8 @@ function populateRarity(r) {
     const needle = document.getElementById('rarity-needle');
     const needleGlow = document.getElementById('rarity-needle-glow');
     const needleTip = document.getElementById('rarity-needle-tip');
+    const needleTrail = document.getElementById('rarity-needle-trail');
+    if (needleTrail) needleTrail.style.transform = 'rotate(' + angle + 'deg)';
     if (needle) needle.style.transform = 'rotate(' + angle + 'deg)';
     if (needleGlow) needleGlow.style.transform = 'rotate(' + angle + 'deg)';
     if (needleTip) needleTip.style.transform = 'rotate(' + angle + 'deg)';
@@ -2010,6 +2324,369 @@ window.addEventListener('scroll', () => {
 });
 
 document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+// ===== UPGRADE 3: LIVE DATA PULSE =====
+// Flash metrics green on load, then add heartbeat
+setTimeout(() => {
+  document.querySelectorAll('.metric-row .value').forEach((el, i) => {
+    setTimeout(() => el.classList.add('metric-flash'), i * 120);
+    setTimeout(() => {
+      el.classList.remove('metric-flash');
+      if (el.id === 'm-loc' || el.id === 'm-commits') el.classList.add('metric-heartbeat');
+    }, 1000 + i * 120);
+  });
+}, 800);
+
+// ===== UPGRADE 5: HERO PARTICLE BURST =====
+function heroParticleBurst() {
+  const stats = document.querySelector('.command-stats');
+  if (!stats) return;
+  const rect = stats.getBoundingClientRect();
+  for (let i = 0; i < 24; i++) {
+    const p = document.createElement('div');
+    p.className = 'hero-particle';
+    const angle = (Math.PI * 2 * i) / 24 + (Math.random() - 0.5) * 0.5;
+    const dist = 30 + Math.random() * 60;
+    const dx = Math.cos(angle) * dist;
+    const dy = Math.sin(angle) * dist;
+    const size = 2 + Math.random() * 3;
+    p.style.cssText = 'position:fixed;left:' + (rect.left + rect.width/2) + 'px;top:' + (rect.top + rect.height/2) + 'px;width:' + size + 'px;height:' + size + 'px;background:' + (i % 4 === 0 ? 'var(--gold)' : 'var(--ice)') + ';animation:particleBurst 1.2s ease-out forwards;';
+    p.style.setProperty('--dx', dx + 'px');
+    p.style.setProperty('--dy', dy + 'px');
+    p.animate([
+      { transform: 'translate(0,0) scale(1)', opacity: 0.8 },
+      { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(0)', opacity: 0 }
+    ], { duration: 800 + Math.random() * 600, easing: 'cubic-bezier(0.16,1,0.3,1)', fill: 'forwards' });
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1500);
+  }
+}
+// Trigger after counter finishes
+setTimeout(heroParticleBurst, 2700);
+
+// ===== UPGRADE 6: FROSTED GLASS PARALLAX =====
+(function() {
+  const panels = document.querySelectorAll('.panel, .wintermute-section');
+  let px = 0, py = 0;
+  document.addEventListener('mousemove', (e) => {
+    px = (e.clientX / window.innerWidth - 0.5) * 2;
+    py = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+  function parallaxTick() {
+    panels.forEach((panel, i) => {
+      const depth = 1 + (i % 3) * 0.5;
+      const tx = -px * depth;
+      const ty = -py * depth;
+      panel.style.transform = 'translate(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px)';
+    });
+    requestAnimationFrame(parallaxTick);
+  }
+  // Start after entrance animations complete
+  setTimeout(parallaxTick, 1200);
+})();
+
+// ===== UPGRADE 7: GAUGE NEEDLE TRAIL =====
+// Handled in populateRarity — trail moves slightly before real needle
+(function() {
+  const origPopulate = window.populateRarityNeedleTrail;
+  const trailInterval = setInterval(() => {
+    const trail = document.getElementById('rarity-needle-trail');
+    const needle = document.getElementById('rarity-needle');
+    if (trail && needle && needle.style.transform) {
+      trail.style.transform = needle.style.transform;
+      clearInterval(trailInterval);
+    }
+  }, 100);
+  // Start trail slightly earlier
+  setTimeout(() => {
+    const trail = document.getElementById('rarity-needle-trail');
+    if (trail) trail.style.transition = 'transform 2s cubic-bezier(0.16,1,0.3,1)';
+  }, 400);
+})();
+
+// ===== UPGRADE 8: TERMINAL BOOT SEQUENCE =====
+(function() {
+  const leftBar = document.querySelector('.status-bar .left');
+  if (!leftBar) return;
+  const origHTML = leftBar.innerHTML;
+  const bootLines = [
+    'SYSTEM INIT',
+    '36 repos indexed',
+    'metrics loaded',
+    '107.3% FRONTIER+',
+    'LIVE'
+  ];
+  leftBar.innerHTML = '<span id="boot-text" style="color:var(--ice)"></span><span class="boot-cursor"></span>';
+  const bootText = document.getElementById('boot-text');
+  let lineIdx = 0, charIdx = 0;
+  function typeBoot() {
+    if (lineIdx >= bootLines.length) {
+      setTimeout(() => { leftBar.innerHTML = origHTML; }, 400);
+      return;
+    }
+    if (charIdx <= bootLines[lineIdx].length) {
+      bootText.textContent = bootLines[lineIdx].substring(0, charIdx);
+      charIdx++;
+      setTimeout(typeBoot, 30 + Math.random() * 20);
+    } else {
+      charIdx = 0;
+      lineIdx++;
+      setTimeout(typeBoot, 200);
+    }
+  }
+  setTimeout(typeBoot, 300);
+})();
+
+// ===== UPGRADE 10: SPARKLINES IN SYSTEM CARDS =====
+function addSparklines() {
+  document.querySelectorAll('.system-card').forEach(card => {
+    if (card.querySelector('.sparkline')) return;
+    // Generate plausible ascending activity curve
+    const points = [];
+    let val = 10 + Math.random() * 20;
+    for (let i = 0; i < 12; i++) {
+      val += Math.random() * 15 - 3;
+      val = Math.max(5, Math.min(55, val));
+      points.push(val);
+    }
+    // Normalize to viewBox
+    const max = Math.max(...points);
+    const min = Math.min(...points);
+    const range = max - min || 1;
+    const coords = points.map((v, i) => {
+      const x = (i / 11) * 100;
+      const y = 16 - ((v - min) / range) * 14;
+      return x.toFixed(1) + ',' + y.toFixed(1);
+    }).join(' ');
+    // Area fill path
+    const areaCoords = coords + ' 100,16 0,16';
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('class', 'sparkline');
+    svg.setAttribute('viewBox', '0 0 100 16');
+    svg.setAttribute('preserveAspectRatio', 'none');
+    svg.innerHTML = '<polygon class="spark-area" points="' + areaCoords + '"/><polyline points="' + coords + '"/>';
+    // Insert before commits line
+    const commits = card.querySelector('.commits');
+    if (commits) card.insertBefore(svg, commits);
+    else card.appendChild(svg);
+  });
+}
+// Run after systems grid is populated
+setTimeout(addSparklines, 600);
+// Re-run after live metrics load (grid rebuilt)
+const sparkObs = new MutationObserver(() => setTimeout(addSparklines, 100));
+const sysGrid = document.getElementById('systems-grid');
+if (sysGrid) sparkObs.observe(sysGrid, { childList: true });
+
+// ===== UPGRADE 11: NEURAL NETWORK VISUALIZATION =====
+(function() {
+  const canvas = document.getElementById('neural-net-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio, 2);
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Node layout: 4 layers
+  const layers = [3, 5, 5, 3];
+  const nodes = [];
+  const w = canvas.width / dpr;
+  const h = canvas.height / dpr;
+
+  layers.forEach((count, li) => {
+    const x = (li + 1) / (layers.length + 1) * w;
+    for (let ni = 0; ni < count; ni++) {
+      const y = (ni + 1) / (count + 1) * h;
+      nodes.push({ x, y, layer: li, activation: 0, targetAct: 0 });
+    }
+  });
+
+  // Connections between adjacent layers
+  const connections = [];
+  let offset = 0;
+  for (let li = 0; li < layers.length - 1; li++) {
+    const nextOffset = offset + layers[li];
+    for (let a = offset; a < nextOffset; a++) {
+      for (let b = nextOffset; b < nextOffset + layers[li + 1]; b++) {
+        connections.push({ from: a, to: b, pulse: 0, speed: 0.005 + Math.random() * 0.01 });
+      }
+    }
+    offset = nextOffset;
+  }
+
+  // Activate nodes in sequence matching benchmark scores
+  const benchScores = [0.913, 0.95, 0.929, 0.925, 0.813, 0.933, 0.767, 0.85];
+  let activationPhase = 0;
+
+  function animateNet() {
+    ctx.clearRect(0, 0, w, h);
+    const t = performance.now() * 0.001;
+
+    // Cycle activations
+    activationPhase = (t * 0.3) % (nodes.length + 2);
+    nodes.forEach((n, i) => {
+      const layerProgress = (t * 0.5 + n.layer * 0.8) % 4;
+      n.targetAct = layerProgress < 1 ? layerProgress : (layerProgress < 2 ? 1 : (layerProgress < 3 ? 3 - layerProgress : 0));
+      n.activation += (n.targetAct - n.activation) * 0.05;
+    });
+
+    // Draw connections
+    connections.forEach(c => {
+      const from = nodes[c.from];
+      const to = nodes[c.to];
+      c.pulse = (c.pulse + c.speed) % 1;
+      const alpha = 0.04 + Math.max(from.activation, to.activation) * 0.12;
+
+      ctx.beginPath();
+      ctx.moveTo(from.x, from.y);
+      ctx.lineTo(to.x, to.y);
+      ctx.strokeStyle = 'rgba(42, 111, 138, ' + alpha.toFixed(3) + ')';
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // Data pulse dot traveling along connection
+      if (from.activation > 0.3) {
+        const px = from.x + (to.x - from.x) * c.pulse;
+        const py = from.y + (to.y - from.y) * c.pulse;
+        ctx.beginPath();
+        ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(42, 111, 138, ' + (0.3 + from.activation * 0.4).toFixed(2) + ')';
+        ctx.fill();
+      }
+    });
+
+    // Draw nodes
+    nodes.forEach(n => {
+      const r = 3 + n.activation * 3;
+      // Glow
+      if (n.activation > 0.2) {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r + 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(42, 111, 138, ' + (n.activation * 0.15).toFixed(3) + ')';
+        ctx.fill();
+      }
+      // Core
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      const isGold = n.layer === layers.length - 1;
+      ctx.fillStyle = isGold
+        ? 'rgba(176, 134, 48, ' + (0.3 + n.activation * 0.5).toFixed(2) + ')'
+        : 'rgba(42, 111, 138, ' + (0.2 + n.activation * 0.6).toFixed(2) + ')';
+      ctx.fill();
+    });
+
+    requestAnimationFrame(animateNet);
+  }
+
+  // Start after wintermute section is visible
+  const netObs = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      animateNet();
+      netObs.disconnect();
+    }
+  }, { threshold: 0.1 });
+  netObs.observe(canvas.parentElement);
+})();
+
+// ===== UPGRADE 12: AMBIENT SOUND =====
+(function() {
+  const btn = document.getElementById('sound-toggle');
+  if (!btn) return;
+  let audioCtx = null;
+  let playing = false;
+  let nodes = {};
+
+  function createAmbient() {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const master = audioCtx.createGain();
+    master.gain.value = 0;
+    master.connect(audioCtx.destination);
+
+    // Deep drone
+    const osc1 = audioCtx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.value = 55;
+    const g1 = audioCtx.createGain();
+    g1.gain.value = 0.08;
+    osc1.connect(g1);
+    g1.connect(master);
+    osc1.start();
+
+    // Higher harmonic
+    const osc2 = audioCtx.createOscillator();
+    osc2.type = 'sine';
+    osc2.frequency.value = 110;
+    const g2 = audioCtx.createGain();
+    g2.gain.value = 0.03;
+    osc2.connect(g2);
+    g2.connect(master);
+    osc2.start();
+
+    // Subtle noise layer
+    const bufSize = audioCtx.sampleRate * 2;
+    const noiseBuf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+    const noiseData = noiseBuf.getChannelData(0);
+    for (let i = 0; i < bufSize; i++) noiseData[i] = (Math.random() * 2 - 1) * 0.015;
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = noiseBuf;
+    noise.loop = true;
+    const noiseFilter = audioCtx.createBiquadFilter();
+    noiseFilter.type = 'lowpass';
+    noiseFilter.frequency.value = 200;
+    noise.connect(noiseFilter);
+    noiseFilter.connect(master);
+    noise.start();
+
+    // Occasional blip
+    function scheduleBlip() {
+      if (!playing) return;
+      const blip = audioCtx.createOscillator();
+      blip.type = 'sine';
+      blip.frequency.value = 800 + Math.random() * 1200;
+      const bg = audioCtx.createGain();
+      bg.gain.setValueAtTime(0.02, audioCtx.currentTime);
+      bg.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+      blip.connect(bg);
+      bg.connect(master);
+      blip.start();
+      blip.stop(audioCtx.currentTime + 0.15);
+      setTimeout(scheduleBlip, 3000 + Math.random() * 8000);
+    }
+    setTimeout(scheduleBlip, 2000);
+
+    nodes = { master, osc1, osc2, noise };
+  }
+
+  btn.addEventListener('click', () => {
+    if (!audioCtx) createAmbient();
+    playing = !playing;
+    btn.classList.toggle('active', playing);
+    const waves = document.getElementById('sound-waves');
+    if (waves) waves.style.opacity = playing ? '1' : '0.3';
+    if (playing) {
+      nodes.master.gain.linearRampToValueAtTime(1, audioCtx.currentTime + 1.5);
+    } else {
+      nodes.master.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
+    }
+  });
+})();
 </script>
+
+<!-- Sound Toggle -->
+<button class="sound-toggle" id="sound-toggle" title="Toggle ambient sound">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+    <path id="sound-waves" d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" opacity="0.3"/>
+  </svg>
+</button>
+
 </body>
+</html>
 </html>
