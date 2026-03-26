@@ -72,7 +72,7 @@
       { "id": "benchmarks", "label": "Published AI Benchmark Results", "p": 0.005, "rarity": 200, "source": "Papers With Code / HuggingFace", "tier": "rare", "timeLocked": false }
     ],
     "trajectory": {
-      "locGrowthPerDay": 8000,
+      "locGrowthPerDay": 9350,
       "velocitySustainedMonths": 7,
       "domainsActive": 8,
       "domainsTarget": 10,

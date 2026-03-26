@@ -278,6 +278,10 @@ body::after {
   box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.02);
 }
 
+#velocity-panel {
+  overflow: visible;
+}
+
 .panel-header {
   display: flex;
   justify-content: space-between;
@@ -1972,7 +1976,7 @@ body::after {
       </div>
       <div class="wm-body">
         <div class="wm-bar-outer">
-          <div class="wm-bar-fill" id="wm-bar" data-width="107"></div>
+          <div class="wm-bar-fill" id="wm-bar" data-width="108"></div>
         </div>
         <div class="wm-labels">
           <span>DORMANT</span>
@@ -2271,7 +2275,7 @@ function generateFeed(data) {
       '<span class="event">' + sysId + '</span> ' +
       '<span class="value">' + r.loc.toLocaleString() + ' LOC</span></div>');
   });
-  lines.push('<div class="line" style="animation-delay:' + (top.length * 0.15) + 's"><span class="timestamp">--:--</span> <span class="highlight">COMPOSITE: 107.3% FRONTIER+</span></div>');
+  lines.push('<div class="line" style="animation-delay:' + (top.length * 0.15) + 's"><span class="timestamp">--:--</span> <span class="highlight">COMPOSITE: 108.1% FRONTIER+</span></div>');
   feed.innerHTML = lines.join('');
 }
 
@@ -2314,7 +2318,7 @@ const wmObs = new IntersectionObserver((entries) => {
 
       const scoreEl = document.getElementById('wm-score');
       if (scoreEl) {
-        const target = 107.3;
+        const target = 108.1;
         const start = performance.now();
         function tick(now) {
           const p = Math.min((now - start) / 2000, 1);
@@ -2456,7 +2460,7 @@ setTimeout(heroParticleBurst, 2700);
     'SYSTEM INIT',
     '119 repos indexed',
     'metrics loaded',
-    '107.3% FRONTIER+',
+    '108.1% FRONTIER+',
     'LIVE'
   ];
   leftBar.innerHTML = '<span id="boot-text" style="color:var(--ice)"></span><span class="boot-cursor"></span>';
