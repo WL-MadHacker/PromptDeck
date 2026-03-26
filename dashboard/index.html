@@ -347,8 +347,9 @@ body::after {
 }
 
 .velocity-gauge svg {
-  width: 180px;
-  height: 110px;
+  width: 100%;
+  max-width: 220px;
+  height: auto;
   overflow: visible;
 }
 
@@ -382,7 +383,7 @@ body::after {
 
 .gauge-center-value {
   font-family: var(--font-display);
-  font-size: 2.2rem;
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
   font-weight: 800;
   color: var(--ice);
   text-align: center;
@@ -402,7 +403,8 @@ body::after {
 .gauge-range {
   display: flex;
   justify-content: space-between;
-  width: 160px;
+  width: 100%;
+  max-width: 160px;
   margin-top: 0.25rem;
 }
 
@@ -1089,6 +1091,12 @@ body::after {
   .bench-grid { grid-template-columns: 1fr; }
   .systems-grid { grid-template-columns: 1fr; }
   .status-bar .right { display: none; }
+  .velocity-stats { grid-template-columns: 1fr 1fr; gap: 0.25rem; }
+  .vel-stat { padding: 0.2rem 0.3rem; }
+  .vel-stat .label { font-size: 0.45rem; }
+  .vel-stat .value { font-size: 0.5rem; }
+  .velocity-gauge { padding: 0.25rem 0; }
+  .velocity-gauge svg { max-width: 160px; }
 }
 
 /* ===== UPGRADE 1: STAGGERED ENTRANCE ANIMATIONS ===== */
@@ -1122,6 +1130,12 @@ body::after {
 .system-card:nth-child(10) { animation-delay: 0.55s; }
 .system-card:nth-child(11) { animation-delay: 0.6s; }
 .system-card:nth-child(12) { animation-delay: 0.65s; }
+.system-card:nth-child(13) { animation-delay: 0.7s; }
+.system-card:nth-child(14) { animation-delay: 0.75s; }
+.system-card:nth-child(15) { animation-delay: 0.8s; }
+.system-card:nth-child(16) { animation-delay: 0.85s; }
+.system-card:nth-child(17) { animation-delay: 0.9s; }
+.system-card:nth-child(18) { animation-delay: 0.95s; }
 
 .command-hero {
   opacity: 0;
@@ -1781,7 +1795,7 @@ body::after {
       <div class="panel-header">Velocity Index <span class="status" style="color:var(--green)">PEAK</span></div>
       <div class="panel-body">
         <div class="velocity-gauge">
-          <svg viewBox="0 0 200 130" style="width:220px;height:130px;">
+          <svg viewBox="0 0 200 130" style="width:100%;max-width:220px;height:auto;">
             <defs>
               <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#5a9ab0"/>
@@ -1826,14 +1840,14 @@ body::after {
               <animate attributeName="opacity" values="0.3;0.7;0.3" dur="2s" repeatCount="indefinite"/>
             </circle>
           </svg>
-          <div class="gauge-center-value">18-36x</div>
+          <div class="gauge-center-value" id="vel-center">18-36x</div>
           <div class="gauge-label">vs. Traditional Dev Output</div>
         </div>
         <div class="glow-line"></div>
         <div class="velocity-stats">
-          <div class="vel-stat"><span class="label">Output</span><span class="value green">750+</span></div>
-          <div class="vel-stat"><span class="label">Stack</span><span class="value">15+</span></div>
-          <div class="vel-stat"><span class="label">Daily</span><span class="value gold">~8K LOC</span></div>
+          <div class="vel-stat"><span class="label">Output</span><span class="value green" id="vel-output">1,130+</span></div>
+          <div class="vel-stat"><span class="label">Stack</span><span class="value" id="vel-stack">15+</span></div>
+          <div class="vel-stat"><span class="label">Daily</span><span class="value gold" id="vel-daily">~8K LOC</span></div>
           <div class="vel-stat"><span class="label">Ship</span><span class="value green">CONT.</span></div>
         </div>
       </div>
@@ -2011,21 +2025,31 @@ body::after {
       <div class="panel-body">
         <div class="stack-pills">
           <span class="stack-pill primary">React 19</span>
+          <span class="stack-pill primary">Next.js</span>
           <span class="stack-pill primary">TypeScript</span>
           <span class="stack-pill primary">Node.js</span>
           <span class="stack-pill primary">Python</span>
+          <span class="stack-pill primary">Three.js</span>
           <span class="stack-pill">tRPC</span>
           <span class="stack-pill">Drizzle</span>
           <span class="stack-pill">Hono</span>
           <span class="stack-pill">Flask</span>
           <span class="stack-pill">Rust</span>
+          <span class="stack-pill">C#</span>
           <span class="stack-pill">PostgreSQL</span>
+          <span class="stack-pill">Supabase</span>
           <span class="stack-pill">Redis</span>
           <span class="stack-pill">Docker</span>
+          <span class="stack-pill">Netlify</span>
+          <span class="stack-pill">Vercel</span>
+          <span class="stack-pill">WebGL</span>
+          <span class="stack-pill">WebAudio</span>
           <span class="stack-pill primary">Claude</span>
           <span class="stack-pill primary">GPT-4</span>
-          <span class="stack-pill">Qwen</span>
+          <span class="stack-pill primary">Qwen 3</span>
           <span class="stack-pill">LoRA</span>
+          <span class="stack-pill">HuggingFace</span>
+          <span class="stack-pill">BCI / Neurotech</span>
         </div>
       </div>
     </div>
@@ -2090,6 +2114,19 @@ async function fetchLiveMetrics() {
     document.getElementById('m-value').textContent = '$' + data.totals.equivValueM + 'M est.';
     document.getElementById('hero-loc').dataset.target = data.totals.loc;
     document.getElementById('sys-count').textContent = data.totals.repos + ' repos';
+
+    // Velocity panel — dynamic from metrics.json
+    const velCenter = document.getElementById('vel-center');
+    if (velCenter) velCenter.textContent = data.totals.velocity || '18-36x';
+    const velOutput = document.getElementById('vel-output');
+    if (velOutput) velOutput.textContent = data.totals.features.toLocaleString() + '+';
+    const velDaily = document.getElementById('vel-daily');
+    if (velDaily && data.rarity && data.rarity.trajectory) velDaily.textContent = '~' + (data.rarity.trajectory.locGrowthPerDay / 1000) + 'K LOC';
+    const velStack = document.getElementById('vel-stack');
+    if (velStack) {
+      const stackDim = data.rarity && data.rarity.dimensions && data.rarity.dimensions.find(d => d.id === 'stack_depth');
+      if (stackDim) velStack.textContent = stackDim.label.match(/\d+/)[0] + '+';
+    }
     const statusRepos = document.getElementById('status-repos');
     if (statusRepos) statusRepos.textContent = data.totals.repos + ' repos';
 
@@ -2103,7 +2140,7 @@ async function fetchLiveMetrics() {
     // Systems grid
     const grid = document.getElementById('systems-grid');
     if (grid && data.repos) {
-      const top = data.repos.filter(r => r.loc > 0).sort((a, b) => b.loc - a.loc).slice(0, 12);
+      const top = data.repos.filter(r => r.loc > 0).sort((a, b) => b.loc - a.loc).slice(0, 18);
       const max = top[0].loc;
       grid.innerHTML = top.map((r, i) => {
         const pct = Math.round(r.loc / max * 100);
