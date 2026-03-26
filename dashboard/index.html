@@ -2532,28 +2532,38 @@ if (sysGrid) sparkObs.observe(sysGrid, { childList: true });
   const ctx = canvas.getContext('2d');
   const dpr = Math.min(window.devicePixelRatio, 2);
 
+  var w = 0, h = 0;
   function resize() {
     const rect = canvas.parentElement.getBoundingClientRect();
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    w = rect.width;
+    h = rect.height;
+    // Recompute node positions on resize
+    var idx = 0;
+    layers.forEach(function(count, li) {
+      var x = (li + 1) / (layers.length + 1) * w;
+      for (var ni = 0; ni < count; ni++) {
+        var y = (ni + 1) / (count + 1) * h;
+        if (nodes[idx]) { nodes[idx].x = x; nodes[idx].y = y; }
+        idx++;
+      }
+    });
   }
-  resize();
-  window.addEventListener('resize', resize);
 
   // Node layout: 4 layers
   const layers = [3, 5, 5, 3];
   const nodes = [];
-  const w = canvas.width / dpr;
-  const h = canvas.height / dpr;
 
-  layers.forEach((count, li) => {
-    const x = (li + 1) / (layers.length + 1) * w;
-    for (let ni = 0; ni < count; ni++) {
-      const y = (ni + 1) / (count + 1) * h;
-      nodes.push({ x, y, layer: li, activation: 0, targetAct: 0 });
+  layers.forEach(function(count, li) {
+    for (var ni = 0; ni < count; ni++) {
+      nodes.push({ x: 0, y: 0, layer: li, activation: 0, targetAct: 0 });
     }
   });
+
+  resize();
+  window.addEventListener('resize', resize);
 
   // Connections between adjacent layers
   const connections = [];
@@ -2635,6 +2645,7 @@ if (sysGrid) sparkObs.observe(sysGrid, { childList: true });
   // Start after wintermute section is visible
   const netObs = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting) {
+      resize();
       animateNet();
       netObs.disconnect();
     }
